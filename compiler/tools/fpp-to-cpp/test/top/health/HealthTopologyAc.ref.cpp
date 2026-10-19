@@ -5,6 +5,9 @@
 // ======================================================================
 
 #include "HealthTopologyAc.hpp"
+#if FW_PORT_SPAN_TRACING
+#include "Fw/Port/PortTrace.hpp"
+#endif
 
 // ----------------------------------------------------------------------
 // Component instances
@@ -217,6 +220,10 @@ namespace M {
       static_cast<FwAssertArgType>(portNum),
       static_cast<FwAssertArgType>(NUM_PINGOUT_OUTPUT_PORTS)
     );
+#if FW_PORT_SPAN_TRACING
+    Fw::TraceContext _span;
+    Fw::PortTrace::callBegin(*this, "pingOut", portNum, _span);
+#endif
     const auto instance = this->getInstance();
     switch (instance) {
       default:
@@ -253,6 +260,9 @@ namespace M {
         }
         break;
     }
+#if FW_PORT_SPAN_TRACING
+    Fw::PortTrace::callEnd(*this, "pingOut", portNum, _span);
+#endif
   }
 
 }
@@ -288,6 +298,10 @@ namespace Svc {
       static_cast<FwAssertArgType>(portNum),
       static_cast<FwAssertArgType>(NUM_PINGOUT_OUTPUT_PORTS)
     );
+#if FW_PORT_SPAN_TRACING
+    Fw::TraceContext _span;
+    Fw::PortTrace::callBegin(*this, "pingOut", portNum, _span);
+#endif
     switch (portNum) {
       case 0:
         M::c1.pingIn_handlerBase(
@@ -305,6 +319,9 @@ namespace Svc {
         FW_ASSERT(false, static_cast<FwAssertArgType>(portNum));
         break;
     }
+#if FW_PORT_SPAN_TRACING
+    Fw::PortTrace::callEnd(*this, "pingOut", portNum, _span);
+#endif
   }
 
 }

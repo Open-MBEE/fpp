@@ -2318,7 +2318,14 @@ void PassiveSyncProductsComponentBase ::
     this->m_noArgsOut_OutputPort[portNum].isConnected(),
     static_cast<FwAssertArgType>(portNum)
   );
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _span;
+  Fw::PortTrace::callBegin(*this, "noArgsOut", portNum, _span);
   this->m_noArgsOut_OutputPort[portNum].invoke();
+  Fw::PortTrace::callEnd(*this, "noArgsOut", portNum, _span);
+#else
+  this->m_noArgsOut_OutputPort[portNum].invoke();
+#endif
 }
 
 U32 PassiveSyncProductsComponentBase ::
@@ -2333,7 +2340,15 @@ U32 PassiveSyncProductsComponentBase ::
     this->m_noArgsReturnOut_OutputPort[portNum].isConnected(),
     static_cast<FwAssertArgType>(portNum)
   );
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _span;
+  Fw::PortTrace::callBegin(*this, "noArgsReturnOut", portNum, _span);
+  U32 _result = this->m_noArgsReturnOut_OutputPort[portNum].invoke();
+  Fw::PortTrace::callEnd(*this, "noArgsReturnOut", portNum, _span);
+  return _result;
+#else
   return this->m_noArgsReturnOut_OutputPort[portNum].invoke();
+#endif
 }
 
 Fw::String PassiveSyncProductsComponentBase ::
@@ -2348,7 +2363,15 @@ Fw::String PassiveSyncProductsComponentBase ::
     this->m_noArgsStringReturnOut_OutputPort[portNum].isConnected(),
     static_cast<FwAssertArgType>(portNum)
   );
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _span;
+  Fw::PortTrace::callBegin(*this, "noArgsStringReturnOut", portNum, _span);
+  Fw::String _result = this->m_noArgsStringReturnOut_OutputPort[portNum].invoke();
+  Fw::PortTrace::callEnd(*this, "noArgsStringReturnOut", portNum, _span);
+  return _result;
+#else
   return this->m_noArgsStringReturnOut_OutputPort[portNum].invoke();
+#endif
 }
 
 void PassiveSyncProductsComponentBase ::
@@ -2372,6 +2395,9 @@ void PassiveSyncProductsComponentBase ::
     this->m_typedAliasOut_OutputPort[portNum].isConnected(),
     static_cast<FwAssertArgType>(portNum)
   );
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _span;
+  Fw::PortTrace::callBegin(*this, "typedAliasOut", portNum, _span);
   this->m_typedAliasOut_OutputPort[portNum].invoke(
     u32,
     f32,
@@ -2381,6 +2407,18 @@ void PassiveSyncProductsComponentBase ::
     a,
     s
   );
+  Fw::PortTrace::callEnd(*this, "typedAliasOut", portNum, _span);
+#else
+  this->m_typedAliasOut_OutputPort[portNum].invoke(
+    u32,
+    f32,
+    b,
+    str2,
+    e,
+    a,
+    s
+  );
+#endif
 }
 
 AliasPrim2 PassiveSyncProductsComponentBase ::
@@ -2404,6 +2442,21 @@ AliasPrim2 PassiveSyncProductsComponentBase ::
     this->m_typedAliasReturnOut_OutputPort[portNum].isConnected(),
     static_cast<FwAssertArgType>(portNum)
   );
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _span;
+  Fw::PortTrace::callBegin(*this, "typedAliasReturnOut", portNum, _span);
+  AliasPrim2 _result = this->m_typedAliasReturnOut_OutputPort[portNum].invoke(
+    u32,
+    f32,
+    b,
+    str2,
+    e,
+    a,
+    s
+  );
+  Fw::PortTrace::callEnd(*this, "typedAliasReturnOut", portNum, _span);
+  return _result;
+#else
   return this->m_typedAliasReturnOut_OutputPort[portNum].invoke(
     u32,
     f32,
@@ -2413,6 +2466,7 @@ AliasPrim2 PassiveSyncProductsComponentBase ::
     a,
     s
   );
+#endif
 }
 
 Fw::String PassiveSyncProductsComponentBase ::
@@ -2436,6 +2490,21 @@ Fw::String PassiveSyncProductsComponentBase ::
     this->m_typedAliasReturnStringOut_OutputPort[portNum].isConnected(),
     static_cast<FwAssertArgType>(portNum)
   );
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _span;
+  Fw::PortTrace::callBegin(*this, "typedAliasReturnStringOut", portNum, _span);
+  Fw::String _result = this->m_typedAliasReturnStringOut_OutputPort[portNum].invoke(
+    u32,
+    f32,
+    b,
+    str2,
+    e,
+    a,
+    s
+  );
+  Fw::PortTrace::callEnd(*this, "typedAliasReturnStringOut", portNum, _span);
+  return _result;
+#else
   return this->m_typedAliasReturnStringOut_OutputPort[portNum].invoke(
     u32,
     f32,
@@ -2445,6 +2514,7 @@ Fw::String PassiveSyncProductsComponentBase ::
     a,
     s
   );
+#endif
 }
 
 void PassiveSyncProductsComponentBase ::
@@ -2468,6 +2538,9 @@ void PassiveSyncProductsComponentBase ::
     this->m_typedOut_OutputPort[portNum].isConnected(),
     static_cast<FwAssertArgType>(portNum)
   );
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _span;
+  Fw::PortTrace::callBegin(*this, "typedOut", portNum, _span);
   this->m_typedOut_OutputPort[portNum].invoke(
     u32,
     f32,
@@ -2477,6 +2550,18 @@ void PassiveSyncProductsComponentBase ::
     a,
     s
   );
+  Fw::PortTrace::callEnd(*this, "typedOut", portNum, _span);
+#else
+  this->m_typedOut_OutputPort[portNum].invoke(
+    u32,
+    f32,
+    b,
+    str1,
+    e,
+    a,
+    s
+  );
+#endif
 }
 
 F32 PassiveSyncProductsComponentBase ::
@@ -2500,6 +2585,21 @@ F32 PassiveSyncProductsComponentBase ::
     this->m_typedReturnOut_OutputPort[portNum].isConnected(),
     static_cast<FwAssertArgType>(portNum)
   );
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _span;
+  Fw::PortTrace::callBegin(*this, "typedReturnOut", portNum, _span);
+  F32 _result = this->m_typedReturnOut_OutputPort[portNum].invoke(
+    u32,
+    f32,
+    b,
+    str2,
+    e,
+    a,
+    s
+  );
+  Fw::PortTrace::callEnd(*this, "typedReturnOut", portNum, _span);
+  return _result;
+#else
   return this->m_typedReturnOut_OutputPort[portNum].invoke(
     u32,
     f32,
@@ -2509,6 +2609,7 @@ F32 PassiveSyncProductsComponentBase ::
     a,
     s
   );
+#endif
 }
 
 #endif

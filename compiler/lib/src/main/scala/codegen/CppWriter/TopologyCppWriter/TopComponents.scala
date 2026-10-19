@@ -38,6 +38,20 @@ case class TopComponents(
       CppDoc.Lines.Cpp
     )
 
+  def hasTypedOutputPorts: Boolean = componentMap.exists {
+    case (component, portNameMap) =>
+      portNameMap.keys.exists(portName =>
+        component.portMap(portName) match {
+          case p: PortInstance.General =>
+            p.getType.get match {
+              case PortInstance.Type.DefPort(_) => true
+              case _ => false
+            }
+          case _ => false
+        }
+      )
+  }
+
   private def getComponentMembers =
     sortedComponentList.flatMap(getMembersForComponent)
 

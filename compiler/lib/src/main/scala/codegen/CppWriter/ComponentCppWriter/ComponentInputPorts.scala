@@ -311,6 +311,35 @@ case class ComponentInputPorts(
       case PortInstance.Type.DefPort(_) => "msg"
       case PortInstance.Type.Serial => "msgSerBuff"
     }
+    val traceContext = p match {
+      case _: PortInstance.General =>
+        p.getType.get match {
+          case PortInstance.Type.DefPort(_) => true
+          case _ => false
+        }
+      case _ => false
+    }
+    val traceContextCapture = if traceContext then lines(
+      """|#if FW_PORT_SPAN_TRACING
+         |Fw::TraceContext _cause;
+         |Fw::PortTrace::current(_cause);
+         |#endif
+         |"""
+    ) else Nil
+    val traceContextSerialize = if traceContext then lines(
+      """|#if FW_PORT_SPAN_TRACING
+         |_status = msg.serializeFrom(
+         |  reinterpret_cast<const U8*>(&_cause),
+         |  static_cast<FwSizeType>(sizeof(_cause)),
+         |  Fw::Serialization::OMIT_LENGTH
+         |);
+         |FW_ASSERT(
+         |  _status == Fw::FW_SERIALIZE_OK,
+         |  static_cast<FwAssertArgType>(_status)
+         |);
+         |#endif
+         |"""
+    ) else Nil
     intersperseBlankLines(
       List(
         p.getType.get match {
@@ -325,7 +354,8 @@ case class ComponentInputPorts(
               s"""|ComponentIpcSerializableBuffer $bufferName;
                   |Fw::SerializeStatus _status = Fw::FW_SERIALIZE_OK;
                   |"""
-            )
+            ),
+            traceContextCapture
           )
           case PortInstance.Type.Serial => lines(
             s"""|// Declare buffer for ${p.getUnqualifiedName}
@@ -356,6 +386,7 @@ case class ComponentInputPorts(
               |);
               |"""
         ),
+        traceContextSerialize,
         intersperseBlankLines(
           getPortParams(p).map((n, _, tyOpt) => {
             val serializeExpr = tyOpt match {
@@ -381,7 +412,8 @@ case class ComponentInputPorts(
           priority,
           MessageType.Port,
           p.getUnqualifiedName,
-          portNumParam :: getPortFunctionParams(p)
+          portNumParam :: getPortFunctionParams(p),
+          if traceContext then Some(p.getUnqualifiedName) else None
         )
       )
     )

@@ -50,7 +50,11 @@ namespace {
         // Max data size
         MAX_DATA_SIZE = sizeof(BuffUnion),
         // Max message size: Size of message id + size of port + max data size
+#if FW_PORT_SPAN_TRACING
+        SERIALIZATION_SIZE = DATA_OFFSET + MAX_DATA_SIZE + sizeof(Fw::TraceContext)
+#else
         SERIALIZATION_SIZE = DATA_OFFSET + MAX_DATA_SIZE
+#endif
       };
 
       ComponentIpcSerializableBuffer() : Fw::LinearBufferBase(m_buff, sizeof(m_buff)) {
@@ -1072,6 +1076,10 @@ void ActiveOverflowComponentBase ::
   );
   ComponentIpcSerializableBuffer msg;
   Fw::SerializeStatus _status = Fw::FW_SERIALIZE_OK;
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _cause;
+  Fw::PortTrace::current(_cause);
+#endif
 
   // Serialize message ID
   _status = msg.serializeFrom(
@@ -1088,6 +1096,18 @@ void ActiveOverflowComponentBase ::
     _status == Fw::FW_SERIALIZE_OK,
     static_cast<FwAssertArgType>(_status)
   );
+
+#if FW_PORT_SPAN_TRACING
+  _status = msg.serializeFrom(
+    reinterpret_cast<const U8*>(&_cause),
+    static_cast<FwSizeType>(sizeof(_cause)),
+    Fw::Serialization::OMIT_LENGTH
+  );
+  FW_ASSERT(
+    _status == Fw::FW_SERIALIZE_OK,
+    static_cast<FwAssertArgType>(_status)
+  );
+#endif
 
   // Serialize argument u32
   _status = msg.serializeFrom(u32);
@@ -1179,6 +1199,10 @@ void ActiveOverflowComponentBase ::
   );
   ComponentIpcSerializableBuffer msg;
   Fw::SerializeStatus _status = Fw::FW_SERIALIZE_OK;
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _cause;
+  Fw::PortTrace::current(_cause);
+#endif
 
   // Serialize message ID
   _status = msg.serializeFrom(
@@ -1195,6 +1219,18 @@ void ActiveOverflowComponentBase ::
     _status == Fw::FW_SERIALIZE_OK,
     static_cast<FwAssertArgType>(_status)
   );
+
+#if FW_PORT_SPAN_TRACING
+  _status = msg.serializeFrom(
+    reinterpret_cast<const U8*>(&_cause),
+    static_cast<FwSizeType>(sizeof(_cause)),
+    Fw::Serialization::OMIT_LENGTH
+  );
+  FW_ASSERT(
+    _status == Fw::FW_SERIALIZE_OK,
+    static_cast<FwAssertArgType>(_status)
+  );
+#endif
 
   // Serialize argument u32
   _status = msg.serializeFrom(u32);
@@ -1286,6 +1322,10 @@ void ActiveOverflowComponentBase ::
   );
   ComponentIpcSerializableBuffer msg;
   Fw::SerializeStatus _status = Fw::FW_SERIALIZE_OK;
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _cause;
+  Fw::PortTrace::current(_cause);
+#endif
 
   // Serialize message ID
   _status = msg.serializeFrom(
@@ -1302,6 +1342,18 @@ void ActiveOverflowComponentBase ::
     _status == Fw::FW_SERIALIZE_OK,
     static_cast<FwAssertArgType>(_status)
   );
+
+#if FW_PORT_SPAN_TRACING
+  _status = msg.serializeFrom(
+    reinterpret_cast<const U8*>(&_cause),
+    static_cast<FwSizeType>(sizeof(_cause)),
+    Fw::Serialization::OMIT_LENGTH
+  );
+  FW_ASSERT(
+    _status == Fw::FW_SERIALIZE_OK,
+    static_cast<FwAssertArgType>(_status)
+  );
+#endif
 
   // Serialize argument u32
   _status = msg.serializeFrom(u32);
@@ -1357,6 +1409,9 @@ void ActiveOverflowComponentBase ::
   Os::Queue::Status qStatus = this->m_queue.send(msg, 0, _block);
 
   if (qStatus == Os::Queue::Status::FULL) {
+#if FW_PORT_SPAN_TRACING
+    Fw::PortTrace::dropped(*this, "dropAsync", portNum, _cause);
+#endif
     this->incNumMsgDropped();
     return;
   }
@@ -1398,6 +1453,10 @@ void ActiveOverflowComponentBase ::
   );
   ComponentIpcSerializableBuffer msg;
   Fw::SerializeStatus _status = Fw::FW_SERIALIZE_OK;
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _cause;
+  Fw::PortTrace::current(_cause);
+#endif
 
   // Serialize message ID
   _status = msg.serializeFrom(
@@ -1414,6 +1473,18 @@ void ActiveOverflowComponentBase ::
     _status == Fw::FW_SERIALIZE_OK,
     static_cast<FwAssertArgType>(_status)
   );
+
+#if FW_PORT_SPAN_TRACING
+  _status = msg.serializeFrom(
+    reinterpret_cast<const U8*>(&_cause),
+    static_cast<FwSizeType>(sizeof(_cause)),
+    Fw::Serialization::OMIT_LENGTH
+  );
+  FW_ASSERT(
+    _status == Fw::FW_SERIALIZE_OK,
+    static_cast<FwAssertArgType>(_status)
+  );
+#endif
 
   // Serialize argument u32
   _status = msg.serializeFrom(u32);
@@ -1469,6 +1540,9 @@ void ActiveOverflowComponentBase ::
   Os::Queue::Status qStatus = this->m_queue.send(msg, 0, _block);
 
   if (qStatus == Os::Queue::Status::FULL) {
+#if FW_PORT_SPAN_TRACING
+    Fw::PortTrace::dropped(*this, "hookAsync", portNum, _cause);
+#endif
     this->hookAsync_overflowHook(portNum, u32, f32, b, str1, e, a, s);
     return;
   }
@@ -1976,6 +2050,20 @@ Fw::QueuedComponentBase::MsgDispatchStatus ActiveOverflowComponentBase ::
 
     // Handle async input port assertAsync
     case ASSERTASYNC_TYPED: {
+#if FW_PORT_SPAN_TRACING
+      Fw::TraceContext _cause;
+      FwSizeType _causeSize = static_cast<FwSizeType>(sizeof(_cause));
+      _deserStatus = _msg.deserializeTo(
+        reinterpret_cast<U8*>(&_cause),
+        _causeSize,
+        Fw::Serialization::OMIT_LENGTH
+      );
+      FW_ASSERT(
+        _deserStatus == Fw::FW_SERIALIZE_OK,
+        static_cast<FwAssertArgType>(_deserStatus)
+      );
+      Fw::TraceContext _span;
+#endif
       // Deserialize argument u32
       U32 u32;
       _deserStatus = _msg.deserializeTo(u32);
@@ -2032,6 +2120,15 @@ Fw::QueuedComponentBase::MsgDispatchStatus ActiveOverflowComponentBase ::
         _deserStatus == Fw::FW_SERIALIZE_OK,
         static_cast<FwAssertArgType>(_deserStatus)
       );
+#if FW_PORT_SPAN_TRACING
+      Fw::PortTrace::dispatchBegin(
+        *this,
+        "assertAsync",
+        portNum,
+        _cause,
+        _span
+      );
+#endif
       // Call handler function
       this->assertAsync_handler(
         portNum,
@@ -2043,12 +2140,34 @@ Fw::QueuedComponentBase::MsgDispatchStatus ActiveOverflowComponentBase ::
         a,
         s
       );
+#if FW_PORT_SPAN_TRACING
+      Fw::PortTrace::dispatchEnd(
+        *this,
+        "assertAsync",
+        portNum,
+        _span
+      );
+#endif
 
       break;
     }
 
     // Handle async input port blockAsync
     case BLOCKASYNC_TYPED: {
+#if FW_PORT_SPAN_TRACING
+      Fw::TraceContext _cause;
+      FwSizeType _causeSize = static_cast<FwSizeType>(sizeof(_cause));
+      _deserStatus = _msg.deserializeTo(
+        reinterpret_cast<U8*>(&_cause),
+        _causeSize,
+        Fw::Serialization::OMIT_LENGTH
+      );
+      FW_ASSERT(
+        _deserStatus == Fw::FW_SERIALIZE_OK,
+        static_cast<FwAssertArgType>(_deserStatus)
+      );
+      Fw::TraceContext _span;
+#endif
       // Deserialize argument u32
       U32 u32;
       _deserStatus = _msg.deserializeTo(u32);
@@ -2105,6 +2224,15 @@ Fw::QueuedComponentBase::MsgDispatchStatus ActiveOverflowComponentBase ::
         _deserStatus == Fw::FW_SERIALIZE_OK,
         static_cast<FwAssertArgType>(_deserStatus)
       );
+#if FW_PORT_SPAN_TRACING
+      Fw::PortTrace::dispatchBegin(
+        *this,
+        "blockAsync",
+        portNum,
+        _cause,
+        _span
+      );
+#endif
       // Call handler function
       this->blockAsync_handler(
         portNum,
@@ -2116,12 +2244,34 @@ Fw::QueuedComponentBase::MsgDispatchStatus ActiveOverflowComponentBase ::
         a,
         s
       );
+#if FW_PORT_SPAN_TRACING
+      Fw::PortTrace::dispatchEnd(
+        *this,
+        "blockAsync",
+        portNum,
+        _span
+      );
+#endif
 
       break;
     }
 
     // Handle async input port dropAsync
     case DROPASYNC_TYPED: {
+#if FW_PORT_SPAN_TRACING
+      Fw::TraceContext _cause;
+      FwSizeType _causeSize = static_cast<FwSizeType>(sizeof(_cause));
+      _deserStatus = _msg.deserializeTo(
+        reinterpret_cast<U8*>(&_cause),
+        _causeSize,
+        Fw::Serialization::OMIT_LENGTH
+      );
+      FW_ASSERT(
+        _deserStatus == Fw::FW_SERIALIZE_OK,
+        static_cast<FwAssertArgType>(_deserStatus)
+      );
+      Fw::TraceContext _span;
+#endif
       // Deserialize argument u32
       U32 u32;
       _deserStatus = _msg.deserializeTo(u32);
@@ -2178,6 +2328,15 @@ Fw::QueuedComponentBase::MsgDispatchStatus ActiveOverflowComponentBase ::
         _deserStatus == Fw::FW_SERIALIZE_OK,
         static_cast<FwAssertArgType>(_deserStatus)
       );
+#if FW_PORT_SPAN_TRACING
+      Fw::PortTrace::dispatchBegin(
+        *this,
+        "dropAsync",
+        portNum,
+        _cause,
+        _span
+      );
+#endif
       // Call handler function
       this->dropAsync_handler(
         portNum,
@@ -2189,12 +2348,34 @@ Fw::QueuedComponentBase::MsgDispatchStatus ActiveOverflowComponentBase ::
         a,
         s
       );
+#if FW_PORT_SPAN_TRACING
+      Fw::PortTrace::dispatchEnd(
+        *this,
+        "dropAsync",
+        portNum,
+        _span
+      );
+#endif
 
       break;
     }
 
     // Handle async input port hookAsync
     case HOOKASYNC_TYPED: {
+#if FW_PORT_SPAN_TRACING
+      Fw::TraceContext _cause;
+      FwSizeType _causeSize = static_cast<FwSizeType>(sizeof(_cause));
+      _deserStatus = _msg.deserializeTo(
+        reinterpret_cast<U8*>(&_cause),
+        _causeSize,
+        Fw::Serialization::OMIT_LENGTH
+      );
+      FW_ASSERT(
+        _deserStatus == Fw::FW_SERIALIZE_OK,
+        static_cast<FwAssertArgType>(_deserStatus)
+      );
+      Fw::TraceContext _span;
+#endif
       // Deserialize argument u32
       U32 u32;
       _deserStatus = _msg.deserializeTo(u32);
@@ -2251,6 +2432,15 @@ Fw::QueuedComponentBase::MsgDispatchStatus ActiveOverflowComponentBase ::
         _deserStatus == Fw::FW_SERIALIZE_OK,
         static_cast<FwAssertArgType>(_deserStatus)
       );
+#if FW_PORT_SPAN_TRACING
+      Fw::PortTrace::dispatchBegin(
+        *this,
+        "hookAsync",
+        portNum,
+        _cause,
+        _span
+      );
+#endif
       // Call handler function
       this->hookAsync_handler(
         portNum,
@@ -2262,6 +2452,14 @@ Fw::QueuedComponentBase::MsgDispatchStatus ActiveOverflowComponentBase ::
         a,
         s
       );
+#if FW_PORT_SPAN_TRACING
+      Fw::PortTrace::dispatchEnd(
+        *this,
+        "hookAsync",
+        portNum,
+        _span
+      );
+#endif
 
       break;
     }

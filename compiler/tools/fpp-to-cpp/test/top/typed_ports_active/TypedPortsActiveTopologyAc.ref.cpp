@@ -5,6 +5,9 @@
 // ======================================================================
 
 #include "TypedPortsActiveTopologyAc.hpp"
+#if FW_PORT_SPAN_TRACING
+#include "Fw/Port/PortTrace.hpp"
+#endif
 
 // ----------------------------------------------------------------------
 // Component instances
@@ -361,6 +364,10 @@ namespace TypedPortsActive {
       static_cast<FwAssertArgType>(portNum),
       static_cast<FwAssertArgType>(NUM_P1_OUTPUT_PORTS)
     );
+#if FW_PORT_SPAN_TRACING
+    Fw::TraceContext _span;
+    Fw::PortTrace::callBegin(*this, "p1", portNum, _span);
+#endif
     switch (portNum) {
       case 0:
         TypedPortsActive::receiver.p1_handlerBase(
@@ -390,6 +397,9 @@ namespace TypedPortsActive {
         FW_ASSERT(false, static_cast<FwAssertArgType>(portNum));
         break;
     }
+#if FW_PORT_SPAN_TRACING
+    Fw::PortTrace::callEnd(*this, "p1", portNum, _span);
+#endif
   }
 
   U32 SenderComponentBase::p2_out(
@@ -401,6 +411,10 @@ namespace TypedPortsActive {
       static_cast<FwAssertArgType>(portNum),
       static_cast<FwAssertArgType>(NUM_P2_OUTPUT_PORTS)
     );
+#if FW_PORT_SPAN_TRACING
+    Fw::TraceContext _span;
+    Fw::PortTrace::callBegin(*this, "p2", portNum, _span);
+#endif
     U32 _result = {};
     switch (portNum) {
       case 0:
@@ -419,6 +433,9 @@ namespace TypedPortsActive {
         FW_ASSERT(false, static_cast<FwAssertArgType>(portNum));
         break;
     }
+#if FW_PORT_SPAN_TRACING
+    Fw::PortTrace::callEnd(*this, "p2", portNum, _span);
+#endif
     return _result;
   }
 
@@ -431,6 +448,10 @@ namespace TypedPortsActive {
       static_cast<FwAssertArgType>(portNum),
       static_cast<FwAssertArgType>(NUM_P3_OUTPUT_PORTS)
     );
+#if FW_PORT_SPAN_TRACING
+    Fw::TraceContext _span;
+    Fw::PortTrace::callBegin(*this, "p3", portNum, _span);
+#endif
     F32 _result = {};
     switch (portNum) {
       case 0:
@@ -449,6 +470,9 @@ namespace TypedPortsActive {
         FW_ASSERT(false, static_cast<FwAssertArgType>(portNum));
         break;
     }
+#if FW_PORT_SPAN_TRACING
+    Fw::PortTrace::callEnd(*this, "p3", portNum, _span);
+#endif
     return _result;
   }
 
@@ -461,6 +485,10 @@ namespace TypedPortsActive {
       static_cast<FwAssertArgType>(portNum),
       static_cast<FwAssertArgType>(NUM_P4_OUTPUT_PORTS)
     );
+#if FW_PORT_SPAN_TRACING
+    Fw::TraceContext _span;
+    Fw::PortTrace::callBegin(*this, "p4", portNum, _span);
+#endif
     bool _result = {};
     switch (portNum) {
       case 0:
@@ -479,6 +507,9 @@ namespace TypedPortsActive {
         FW_ASSERT(false, static_cast<FwAssertArgType>(portNum));
         break;
     }
+#if FW_PORT_SPAN_TRACING
+    Fw::PortTrace::callEnd(*this, "p4", portNum, _span);
+#endif
     return _result;
   }
 
@@ -491,6 +522,10 @@ namespace TypedPortsActive {
       static_cast<FwAssertArgType>(portNum),
       static_cast<FwAssertArgType>(NUM_P5_OUTPUT_PORTS)
     );
+#if FW_PORT_SPAN_TRACING
+    Fw::TraceContext _span;
+    Fw::PortTrace::callBegin(*this, "p5", portNum, _span);
+#endif
     Fw::String _result = {};
     switch (portNum) {
       case 0:
@@ -509,6 +544,9 @@ namespace TypedPortsActive {
         FW_ASSERT(false, static_cast<FwAssertArgType>(portNum));
         break;
     }
+#if FW_PORT_SPAN_TRACING
+    Fw::PortTrace::callEnd(*this, "p5", portNum, _span);
+#endif
     return _result;
   }
 
@@ -521,6 +559,10 @@ namespace TypedPortsActive {
       static_cast<FwAssertArgType>(portNum),
       static_cast<FwAssertArgType>(NUM_P6_OUTPUT_PORTS)
     );
+#if FW_PORT_SPAN_TRACING
+    Fw::TraceContext _span;
+    Fw::PortTrace::callBegin(*this, "p6", portNum, _span);
+#endif
     TypedPortsActive::A _result = {};
     switch (portNum) {
       case 0:
@@ -539,6 +581,9 @@ namespace TypedPortsActive {
         FW_ASSERT(false, static_cast<FwAssertArgType>(portNum));
         break;
     }
+#if FW_PORT_SPAN_TRACING
+    Fw::PortTrace::callEnd(*this, "p6", portNum, _span);
+#endif
     return _result;
   }
 
@@ -551,6 +596,10 @@ namespace TypedPortsActive {
       static_cast<FwAssertArgType>(portNum),
       static_cast<FwAssertArgType>(NUM_P7_OUTPUT_PORTS)
     );
+#if FW_PORT_SPAN_TRACING
+    Fw::TraceContext _span;
+    Fw::PortTrace::callBegin(*this, "p7", portNum, _span);
+#endif
     TypedPortsActive::E _result = {};
     switch (portNum) {
       case 0:
@@ -569,6 +618,9 @@ namespace TypedPortsActive {
         FW_ASSERT(false, static_cast<FwAssertArgType>(portNum));
         break;
     }
+#if FW_PORT_SPAN_TRACING
+    Fw::PortTrace::callEnd(*this, "p7", portNum, _span);
+#endif
     return _result;
   }
 
@@ -581,6 +633,10 @@ namespace TypedPortsActive {
       static_cast<FwAssertArgType>(portNum),
       static_cast<FwAssertArgType>(NUM_P8_OUTPUT_PORTS)
     );
+#if FW_PORT_SPAN_TRACING
+    Fw::TraceContext _span;
+    Fw::PortTrace::callBegin(*this, "p8", portNum, _span);
+#endif
     TypedPortsActive::S _result = {};
     switch (portNum) {
       case 0:
@@ -599,6 +655,9 @@ namespace TypedPortsActive {
         FW_ASSERT(false, static_cast<FwAssertArgType>(portNum));
         break;
     }
+#if FW_PORT_SPAN_TRACING
+    Fw::PortTrace::callEnd(*this, "p8", portNum, _span);
+#endif
     return _result;
   }
 

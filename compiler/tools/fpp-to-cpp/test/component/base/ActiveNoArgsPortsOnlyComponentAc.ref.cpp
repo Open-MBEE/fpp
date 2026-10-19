@@ -31,7 +31,11 @@ namespace {
         // Max data size
         MAX_DATA_SIZE = 0,
         // Max message size: Size of message id + size of port + max data size
+#if FW_PORT_SPAN_TRACING
+        SERIALIZATION_SIZE = DATA_OFFSET + MAX_DATA_SIZE + sizeof(Fw::TraceContext)
+#else
         SERIALIZATION_SIZE = DATA_OFFSET + MAX_DATA_SIZE
+#endif
       };
 
       ComponentIpcSerializableBuffer() : Fw::LinearBufferBase(m_buff, sizeof(m_buff)) {
@@ -391,6 +395,10 @@ void ActiveNoArgsPortsOnlyComponentBase ::
   noArgsAsync_preMsgHook(portNum);
   ComponentIpcSerializableBuffer msg;
   Fw::SerializeStatus _status = Fw::FW_SERIALIZE_OK;
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _cause;
+  Fw::PortTrace::current(_cause);
+#endif
 
   // Serialize message ID
   _status = msg.serializeFrom(
@@ -407,6 +415,18 @@ void ActiveNoArgsPortsOnlyComponentBase ::
     _status == Fw::FW_SERIALIZE_OK,
     static_cast<FwAssertArgType>(_status)
   );
+
+#if FW_PORT_SPAN_TRACING
+  _status = msg.serializeFrom(
+    reinterpret_cast<const U8*>(&_cause),
+    static_cast<FwSizeType>(sizeof(_cause)),
+    Fw::Serialization::OMIT_LENGTH
+  );
+  FW_ASSERT(
+    _status == Fw::FW_SERIALIZE_OK,
+    static_cast<FwAssertArgType>(_status)
+  );
+#endif
 
   // Send message
   Os::Queue::BlockingType _block = Os::Queue::NONBLOCKING;
@@ -509,7 +529,14 @@ void ActiveNoArgsPortsOnlyComponentBase ::
     this->m_noArgsOut_OutputPort[portNum].isConnected(),
     static_cast<FwAssertArgType>(portNum)
   );
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _span;
+  Fw::PortTrace::callBegin(*this, "noArgsOut", portNum, _span);
   this->m_noArgsOut_OutputPort[portNum].invoke();
+  Fw::PortTrace::callEnd(*this, "noArgsOut", portNum, _span);
+#else
+  this->m_noArgsOut_OutputPort[portNum].invoke();
+#endif
 }
 
 U32 ActiveNoArgsPortsOnlyComponentBase ::
@@ -524,7 +551,15 @@ U32 ActiveNoArgsPortsOnlyComponentBase ::
     this->m_noArgsReturnOut_OutputPort[portNum].isConnected(),
     static_cast<FwAssertArgType>(portNum)
   );
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _span;
+  Fw::PortTrace::callBegin(*this, "noArgsReturnOut", portNum, _span);
+  U32 _result = this->m_noArgsReturnOut_OutputPort[portNum].invoke();
+  Fw::PortTrace::callEnd(*this, "noArgsReturnOut", portNum, _span);
+  return _result;
+#else
   return this->m_noArgsReturnOut_OutputPort[portNum].invoke();
+#endif
 }
 
 #endif
@@ -594,8 +629,39 @@ Fw::QueuedComponentBase::MsgDispatchStatus ActiveNoArgsPortsOnlyComponentBase ::
   switch (_msgType) {
     // Handle async input port noArgsAsync
     case NOARGSASYNC_NOARGS: {
+#if FW_PORT_SPAN_TRACING
+      Fw::TraceContext _cause;
+      FwSizeType _causeSize = static_cast<FwSizeType>(sizeof(_cause));
+      _deserStatus = _msg.deserializeTo(
+        reinterpret_cast<U8*>(&_cause),
+        _causeSize,
+        Fw::Serialization::OMIT_LENGTH
+      );
+      FW_ASSERT(
+        _deserStatus == Fw::FW_SERIALIZE_OK,
+        static_cast<FwAssertArgType>(_deserStatus)
+      );
+      Fw::TraceContext _span;
+#endif
+#if FW_PORT_SPAN_TRACING
+      Fw::PortTrace::dispatchBegin(
+        *this,
+        "noArgsAsync",
+        portNum,
+        _cause,
+        _span
+      );
+#endif
       // Call handler function
       this->noArgsAsync_handler(portNum);
+#if FW_PORT_SPAN_TRACING
+      Fw::PortTrace::dispatchEnd(
+        *this,
+        "noArgsAsync",
+        portNum,
+        _span
+      );
+#endif
 
       break;
     }

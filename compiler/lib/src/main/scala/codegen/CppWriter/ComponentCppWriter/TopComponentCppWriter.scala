@@ -134,14 +134,36 @@ case class TopComponentCppWriter (
     val numPorts = numPortsConstantName(portInstance)
     val returnType = getInvokerReturnTypeAsString(portInstance)
     val nonVoidReturn = returnType != "void"
+    val tracePort = portInstance match {
+      case p: PortInstance.General => p.getType.get match {
+        case PortInstance.Type.DefPort(_) => Some(p.getUnqualifiedName)
+        case PortInstance.Type.Serial => None
+      }
+      case _ => None
+    }
+    val callBegin = tracePort.map(port => lines(
+      s"""|#if FW_PORT_SPAN_TRACING
+          |Fw::TraceContext _span;
+          |Fw::PortTrace::callBegin(*this, "$port", portNum, _span);
+          |#endif
+          |"""
+    )).getOrElse(Nil)
+    val callEnd = tracePort.map(port => lines(
+      s"""|#if FW_PORT_SPAN_TRACING
+          |Fw::PortTrace::callEnd(*this, "$port", portNum, _span);
+          |#endif
+          |"""
+    )).getOrElse(Nil)
     List.concat(
       writePortNumAssertion(numPorts),
+      callBegin,
       guardedList (nonVoidReturn) (lines(s"$returnType _result = {};")),
       writeInstanceSwitch(
         componentInstanceMap,
         writeOutFnCase,
         lines("FW_ASSERT(false, static_cast<FwAssertArgType>(portNum));")
       ),
+      callEnd,
       guardedList (nonVoidReturn) (lines(s"return _result;"))
     )
   }

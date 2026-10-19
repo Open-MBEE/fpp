@@ -201,6 +201,52 @@ case class ComponentOutputPorts(
       case PortInstance.Type.DefPort(_) => ("invoke", CppDoc.Function.Const)
       case PortInstance.Type.Serial => ("invokeSerial", CppDoc.Function.NonConst)
     }
+    val invocation =
+      s"this->${portVariableName(p)}[portNum].$invokeFunction"
+    val params = getPortParams(p).map(_._1)
+    val normalInvocation =
+      writeFunctionCall(addReturnToInvocation(p)(invocation), Nil, params)
+    val isTypedPort = p match {
+      case _: PortInstance.General =>
+        p.getType.get match {
+          case PortInstance.Type.DefPort(_) => true
+          case _ => false
+        }
+      case _ => false
+    }
+    val invocationLines = if isTypedPort then {
+      val portName = p.getUnqualifiedName
+      val traceInvocation = getInvokerReturnTypeAsString(p) match {
+        case "void" => List.concat(
+          writeFunctionCall(invocation, Nil, params),
+          writeFunctionCall(
+            "Fw::PortTrace::callEnd",
+            List("*this", s"\"$portName\"", "portNum", "_span")
+          )
+        )
+        case returnType => List.concat(
+          writeFunctionCall(s"$returnType _result = $invocation", Nil, params),
+          writeFunctionCall(
+            "Fw::PortTrace::callEnd",
+            List("*this", s"\"$portName\"", "portNum", "_span")
+          ),
+          lines("return _result;")
+        )
+      }
+      List.concat(
+        lines("#if FW_PORT_SPAN_TRACING"),
+        lines("Fw::TraceContext _span;"),
+        writeFunctionCall(
+          "Fw::PortTrace::callBegin",
+          List("*this", s"\"$portName\"", "portNum", "_span")
+        ),
+        traceInvocation,
+        lines("#else"),
+        normalInvocation,
+        lines("#endif")
+      )
+    }
+    else normalInvocation
     val members = List(
       functionClassMember(
         Some(s"Invoke output port ${p.getUnqualifiedName}"),
@@ -220,13 +266,7 @@ case class ComponentOutputPorts(
                 |);
                 |"""
           ),
-          writeFunctionCall(
-            addReturnToInvocation (p) (
-              s"this->${portVariableName(p)}[portNum].$invokeFunction"
-            ),
-            Nil,
-            getPortParams(p).map(_._1),
-          )
+          invocationLines
         ),
         CppDoc.Function.NonSV,
         constQualifier

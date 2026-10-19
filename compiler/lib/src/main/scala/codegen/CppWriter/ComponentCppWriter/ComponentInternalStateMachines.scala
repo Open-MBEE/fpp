@@ -107,7 +107,8 @@ case class ComponentInternalStateMachines(
     queueFull: Ast.QueueFull,
     messageType: MessageType,
     hookBaseName: String,
-    hookParams: List[CppDoc.Function.Param]
+    hookParams: List[CppDoc.Function.Param],
+    tracePortNameOpt: Option[String]
   ): List[Line] =
     queueFull match {
       case Ast.QueueFull.Hook =>
@@ -132,7 +133,8 @@ case class ComponentInternalStateMachines(
         queueFull,
         messageType,
         hookBaseName,
-        hookParams
+        hookParams,
+        tracePortNameOpt
       )
     }
 

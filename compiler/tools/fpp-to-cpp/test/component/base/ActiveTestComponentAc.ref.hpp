@@ -34,6 +34,9 @@
 #if !FW_DIRECT_PORT_CALLS
 #include "Fw/Port/OutputSerializePort.hpp"
 #endif
+#if FW_PORT_SPAN_TRACING
+#include "Fw/Port/PortTrace.hpp"
+#endif
 #include "Fw/Prm/PrmExternalTypes.hpp"
 #include "Fw/Prm/PrmGetPortAc.hpp"
 #include "Fw/Prm/PrmSetPortAc.hpp"

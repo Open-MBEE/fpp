@@ -15,6 +15,9 @@
 #if !FW_DIRECT_PORT_CALLS
 #include "Fw/Port/OutputSerializePort.hpp"
 #endif
+#if FW_PORT_SPAN_TRACING
+#include "Fw/Port/PortTrace.hpp"
+#endif
 #include "NoArgsPortAc.hpp"
 #include "NoArgsReturnPortAc.hpp"
 #include "Os/Mutex.hpp"

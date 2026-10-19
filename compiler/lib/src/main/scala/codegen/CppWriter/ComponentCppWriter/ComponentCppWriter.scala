@@ -99,6 +99,10 @@ case class ComponentCppWriter (
       guardedList (hasEvents) (List("Fw/Log/LogString.hpp"))
     val internalStrHeaders =
       guardedList (hasInternalPorts) (List("Fw/Types/InternalInterfaceString.hpp"))
+    val traceHeaders =
+      guardedList (typedOutputPorts.nonEmpty || typedAsyncInputPorts.nonEmpty) (
+        List("Fw/Port/PortTrace.hpp")
+      )
     val systemHeaders =
       (guardedList (hasEvents) (
         List("atomic")
@@ -118,7 +122,8 @@ case class ComponentCppWriter (
         prmStrHeaders,
         prmExtHeaders,
         logStrHeaders,
-        internalStrHeaders
+        internalStrHeaders,
+        traceHeaders
       ).map(CppWriter.headerString)
       val symbolHeaders = writeIncludeDirectives
       def addConditional(condition: String, header: String) = lines(
@@ -132,6 +137,8 @@ case class ComponentCppWriter (
               addConditional("#if !FW_DIRECT_PORT_CALLS", h)
         case h: "#include \"Fw/Port/OutputSerializePort.hpp\"" =>
               addConditional("#if !FW_DIRECT_PORT_CALLS", h)
+        case h: "#include \"Fw/Port/PortTrace.hpp\"" =>
+              addConditional("#if FW_PORT_SPAN_TRACING", h)
         case h => lines(h)
       })
     }
@@ -396,6 +403,13 @@ case class ComponentCppWriter (
 
   private def getComponentIpcSerializableBufferClass(buffUnion: List[Line]): List[Line] = {
     val maxDataSize = if buffUnion.nonEmpty then "sizeof(BuffUnion)" else "0"
+    val serializationSize = if typedAsyncInputPorts.nonEmpty then
+      """|#if FW_PORT_SPAN_TRACING
+         |      SERIALIZATION_SIZE = DATA_OFFSET + MAX_DATA_SIZE + sizeof(Fw::TraceContext)
+         |#else
+         |      SERIALIZATION_SIZE = DATA_OFFSET + MAX_DATA_SIZE
+         |#endif""".stripMargin
+    else "      SERIALIZATION_SIZE = DATA_OFFSET + MAX_DATA_SIZE"
     lines(
       s"""|// Define a message buffer class large enough to handle all the
           |// asynchronous inputs to the component
@@ -411,7 +425,7 @@ case class ComponentCppWriter (
           |      // Max data size
           |      MAX_DATA_SIZE = $maxDataSize,
           |      // Max message size: Size of message id + size of port + max data size
-          |      SERIALIZATION_SIZE = DATA_OFFSET + MAX_DATA_SIZE
+          |$serializationSize
           |    };
           |
           |    ComponentIpcSerializableBuffer() : Fw::LinearBufferBase(m_buff, sizeof(m_buff)) {
@@ -594,10 +608,51 @@ case class ComponentCppWriter (
   }
 
   private def getDispatchFunctionMember: List[CppDoc.Class.Member] = {
-    def writeAsyncPortDispatch(p: PortInstance) = {
+    def writeAsyncPortDispatch(p: PortInstance, traceContext: Boolean) = {
+      val traceContextLines = if traceContext then lines(
+        """|#if FW_PORT_SPAN_TRACING
+           |Fw::TraceContext _cause;
+           |FwSizeType _causeSize = static_cast<FwSizeType>(sizeof(_cause));
+           |_deserStatus = _msg.deserializeTo(
+           |  reinterpret_cast<U8*>(&_cause),
+           |  _causeSize,
+           |  Fw::Serialization::OMIT_LENGTH
+           |);
+           |FW_ASSERT(
+           |  _deserStatus == Fw::FW_SERIALIZE_OK,
+           |  static_cast<FwAssertArgType>(_deserStatus)
+           |);
+           |Fw::TraceContext _span;
+           |#endif
+           |"""
+      ) else Nil
+      val dispatchBeginLines = if traceContext then lines(
+        s"""|#if FW_PORT_SPAN_TRACING
+            |Fw::PortTrace::dispatchBegin(
+            |  *this,
+            |  "${p.getUnqualifiedName}",
+            |  portNum,
+            |  _cause,
+            |  _span
+            |);
+            |#endif
+            |"""
+      ) else Nil
+      val dispatchEndLines = if traceContext then lines(
+        s"""|#if FW_PORT_SPAN_TRACING
+            |Fw::PortTrace::dispatchEnd(
+            |  *this,
+            |  "${p.getUnqualifiedName}",
+            |  portNum,
+            |  _span
+            |);
+            |#endif
+            |"""
+      ) else Nil
       val body = p.getType.get match {
         case PortInstance.Type.DefPort(_) =>
           List(
+            traceContextLines,
             intersperseBlankLines(
               portParamTypeMap(p.getUnqualifiedName).map((n, tn, t) => {
                 val varDecl = writeVarDecl(s, tn, n, t)
@@ -613,12 +668,14 @@ case class ComponentCppWriter (
                 )
               })
             ),
+            dispatchBeginLines,
             line("// Call handler function") ::
               writeFunctionCall(
                 s"this->${inputPortHandlerName(p.getUnqualifiedName)}",
                 List("portNum"),
                 getPortParams(p).map(_._1)
               ),
+            dispatchEndLines,
             Line.blank :: lines("break;")
           ).flatten
         case PortInstance.Type.Serial => lines(
@@ -862,11 +919,17 @@ case class ComponentCppWriter (
               ),
               Line.blank :: wrapInSwitch(
                 "_msgType",
-                intersperseBlankLines(
-                  List(
-                    intersperseBlankLines(dataProductAsyncInputPorts.map(writeAsyncPortDispatch)),
-                    intersperseBlankLines(typedAsyncInputPorts.map(writeAsyncPortDispatch)),
-                    intersperseBlankLines(serialAsyncInputPorts.map(writeAsyncPortDispatch)),
+                  intersperseBlankLines(
+                    List(
+                    intersperseBlankLines(
+                      dataProductAsyncInputPorts.map(p => writeAsyncPortDispatch(p, false))
+                    ),
+                    intersperseBlankLines(
+                      typedAsyncInputPorts.map(p => writeAsyncPortDispatch(p, true))
+                    ),
+                    intersperseBlankLines(
+                      serialAsyncInputPorts.map(p => writeAsyncPortDispatch(p, false))
+                    ),
                     intersperseBlankLines(asyncCmds.map(writeAsyncCommandDispatch)),
                     intersperseBlankLines(internalPorts.map(writeInternalPortDispatch)),
                     stateMachineWriter.writeDispatchCases,

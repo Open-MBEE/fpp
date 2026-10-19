@@ -5,6 +5,9 @@
 // ======================================================================
 
 #include "DpTopologyAc.hpp"
+#if FW_PORT_SPAN_TRACING
+#include "Fw/Port/PortTrace.hpp"
+#endif
 
 // ----------------------------------------------------------------------
 // Component instances
@@ -488,6 +491,10 @@ namespace M {
       static_cast<FwAssertArgType>(portNum),
       static_cast<FwAssertArgType>(NUM_PRODUCTRESPONSEOUT_OUTPUT_PORTS)
     );
+#if FW_PORT_SPAN_TRACING
+    Fw::TraceContext _span;
+    Fw::PortTrace::callBegin(*this, "productResponseOut", portNum, _span);
+#endif
     switch (portNum) {
       case 0:
         M::c1.productRecvIn_handlerBase(
@@ -501,6 +508,9 @@ namespace M {
         FW_ASSERT(false, static_cast<FwAssertArgType>(portNum));
         break;
     }
+#if FW_PORT_SPAN_TRACING
+    Fw::PortTrace::callEnd(*this, "productResponseOut", portNum, _span);
+#endif
   }
 
 }

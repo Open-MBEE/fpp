@@ -2093,7 +2093,14 @@ void PassiveCommandsComponentBase ::
     this->m_noArgsOut_OutputPort[portNum].isConnected(),
     static_cast<FwAssertArgType>(portNum)
   );
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _span;
+  Fw::PortTrace::callBegin(*this, "noArgsOut", portNum, _span);
   this->m_noArgsOut_OutputPort[portNum].invoke();
+  Fw::PortTrace::callEnd(*this, "noArgsOut", portNum, _span);
+#else
+  this->m_noArgsOut_OutputPort[portNum].invoke();
+#endif
 }
 
 U32 PassiveCommandsComponentBase ::
@@ -2108,7 +2115,15 @@ U32 PassiveCommandsComponentBase ::
     this->m_noArgsReturnOut_OutputPort[portNum].isConnected(),
     static_cast<FwAssertArgType>(portNum)
   );
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _span;
+  Fw::PortTrace::callBegin(*this, "noArgsReturnOut", portNum, _span);
+  U32 _result = this->m_noArgsReturnOut_OutputPort[portNum].invoke();
+  Fw::PortTrace::callEnd(*this, "noArgsReturnOut", portNum, _span);
+  return _result;
+#else
   return this->m_noArgsReturnOut_OutputPort[portNum].invoke();
+#endif
 }
 
 Fw::String PassiveCommandsComponentBase ::
@@ -2123,7 +2138,15 @@ Fw::String PassiveCommandsComponentBase ::
     this->m_noArgsStringReturnOut_OutputPort[portNum].isConnected(),
     static_cast<FwAssertArgType>(portNum)
   );
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _span;
+  Fw::PortTrace::callBegin(*this, "noArgsStringReturnOut", portNum, _span);
+  Fw::String _result = this->m_noArgsStringReturnOut_OutputPort[portNum].invoke();
+  Fw::PortTrace::callEnd(*this, "noArgsStringReturnOut", portNum, _span);
+  return _result;
+#else
   return this->m_noArgsStringReturnOut_OutputPort[portNum].invoke();
+#endif
 }
 
 void PassiveCommandsComponentBase ::
@@ -2147,6 +2170,9 @@ void PassiveCommandsComponentBase ::
     this->m_typedAliasOut_OutputPort[portNum].isConnected(),
     static_cast<FwAssertArgType>(portNum)
   );
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _span;
+  Fw::PortTrace::callBegin(*this, "typedAliasOut", portNum, _span);
   this->m_typedAliasOut_OutputPort[portNum].invoke(
     u32,
     f32,
@@ -2156,6 +2182,18 @@ void PassiveCommandsComponentBase ::
     a,
     s
   );
+  Fw::PortTrace::callEnd(*this, "typedAliasOut", portNum, _span);
+#else
+  this->m_typedAliasOut_OutputPort[portNum].invoke(
+    u32,
+    f32,
+    b,
+    str2,
+    e,
+    a,
+    s
+  );
+#endif
 }
 
 AliasPrim2 PassiveCommandsComponentBase ::
@@ -2179,6 +2217,21 @@ AliasPrim2 PassiveCommandsComponentBase ::
     this->m_typedAliasReturnOut_OutputPort[portNum].isConnected(),
     static_cast<FwAssertArgType>(portNum)
   );
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _span;
+  Fw::PortTrace::callBegin(*this, "typedAliasReturnOut", portNum, _span);
+  AliasPrim2 _result = this->m_typedAliasReturnOut_OutputPort[portNum].invoke(
+    u32,
+    f32,
+    b,
+    str2,
+    e,
+    a,
+    s
+  );
+  Fw::PortTrace::callEnd(*this, "typedAliasReturnOut", portNum, _span);
+  return _result;
+#else
   return this->m_typedAliasReturnOut_OutputPort[portNum].invoke(
     u32,
     f32,
@@ -2188,6 +2241,7 @@ AliasPrim2 PassiveCommandsComponentBase ::
     a,
     s
   );
+#endif
 }
 
 Fw::String PassiveCommandsComponentBase ::
@@ -2211,6 +2265,21 @@ Fw::String PassiveCommandsComponentBase ::
     this->m_typedAliasReturnStringOut_OutputPort[portNum].isConnected(),
     static_cast<FwAssertArgType>(portNum)
   );
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _span;
+  Fw::PortTrace::callBegin(*this, "typedAliasReturnStringOut", portNum, _span);
+  Fw::String _result = this->m_typedAliasReturnStringOut_OutputPort[portNum].invoke(
+    u32,
+    f32,
+    b,
+    str2,
+    e,
+    a,
+    s
+  );
+  Fw::PortTrace::callEnd(*this, "typedAliasReturnStringOut", portNum, _span);
+  return _result;
+#else
   return this->m_typedAliasReturnStringOut_OutputPort[portNum].invoke(
     u32,
     f32,
@@ -2220,6 +2289,7 @@ Fw::String PassiveCommandsComponentBase ::
     a,
     s
   );
+#endif
 }
 
 void PassiveCommandsComponentBase ::
@@ -2243,6 +2313,9 @@ void PassiveCommandsComponentBase ::
     this->m_typedOut_OutputPort[portNum].isConnected(),
     static_cast<FwAssertArgType>(portNum)
   );
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _span;
+  Fw::PortTrace::callBegin(*this, "typedOut", portNum, _span);
   this->m_typedOut_OutputPort[portNum].invoke(
     u32,
     f32,
@@ -2252,6 +2325,18 @@ void PassiveCommandsComponentBase ::
     a,
     s
   );
+  Fw::PortTrace::callEnd(*this, "typedOut", portNum, _span);
+#else
+  this->m_typedOut_OutputPort[portNum].invoke(
+    u32,
+    f32,
+    b,
+    str1,
+    e,
+    a,
+    s
+  );
+#endif
 }
 
 F32 PassiveCommandsComponentBase ::
@@ -2275,6 +2360,21 @@ F32 PassiveCommandsComponentBase ::
     this->m_typedReturnOut_OutputPort[portNum].isConnected(),
     static_cast<FwAssertArgType>(portNum)
   );
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _span;
+  Fw::PortTrace::callBegin(*this, "typedReturnOut", portNum, _span);
+  F32 _result = this->m_typedReturnOut_OutputPort[portNum].invoke(
+    u32,
+    f32,
+    b,
+    str2,
+    e,
+    a,
+    s
+  );
+  Fw::PortTrace::callEnd(*this, "typedReturnOut", portNum, _span);
+  return _result;
+#else
   return this->m_typedReturnOut_OutputPort[portNum].invoke(
     u32,
     f32,
@@ -2284,6 +2384,7 @@ F32 PassiveCommandsComponentBase ::
     a,
     s
   );
+#endif
 }
 
 #endif

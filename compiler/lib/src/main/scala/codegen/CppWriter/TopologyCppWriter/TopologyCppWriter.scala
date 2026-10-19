@@ -10,6 +10,8 @@ case class TopologyCppWriter(
   aNode: Ast.Annotated[AstNode[Ast.DefTopology]]
 ) extends TopologyCppWriterUtils(s, aNode) {
 
+  private val topComponents = TopComponents(s, aNode)
+
   def write: CppDoc = {
     val node = aNode._2
     val data = node.data
@@ -50,11 +52,15 @@ case class TopologyCppWriter(
     }
     val cpp = {
       val fileName = ComputeCppFiles.FileNames.getTopology(name)
+      val traceInclude = if topComponents.hasTypedOutputPorts then lines(
+        s"""|#if FW_PORT_SPAN_TRACING
+            |${CppWriter.headerString("Fw/Port/PortTrace.hpp")}
+            |#endif
+            |"""
+      ) else Nil
       linesMember(
-        List(
-          Line.blank,
-          CppWriter.headerLine(s.getIncludePath(symbol, fileName))
-        ),
+        List(Line.blank, CppWriter.headerLine(s.getIncludePath(symbol, fileName))) ++
+          traceInclude,
         CppDoc.Lines.Cpp
       )
     }
@@ -78,6 +84,6 @@ case class TopologyCppWriter(
   }
 
   private def getComponentMembers: List[CppDoc.Member] =
-    TopComponents(s, aNode).getMembers
+    topComponents.getMembers
 
 }

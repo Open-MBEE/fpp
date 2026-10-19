@@ -700,28 +700,54 @@ abstract class ComponentCppWriterUtils(
     queueFull: Ast.QueueFull,
     messageType: MessageType,
     hookBaseName: String,
-    hookParams: List[CppDoc.Function.Param]
-  ): List[Line] =
+    hookParams: List[CppDoc.Function.Param],
+    tracePortNameOpt: Option[String] = None
+  ): List[Line] = {
     queueFull match {
-      case Ast.QueueFull.Drop => lines(
-        """|if (qStatus == Os::Queue::Status::FULL) {
-           |  this->incNumMsgDropped();
-           |  return;
-           |}
-           |"""
-      )
-      case Ast.QueueFull.Hook =>
-        val hookName = inputOverflowHookName(hookBaseName, messageType)
-        val hookArguments = hookParams.map(_.name).mkString(", ")
-        lines(
+      case Ast.QueueFull.Drop => tracePortNameOpt match {
+        case Some(portName) => lines(
           s"""|if (qStatus == Os::Queue::Status::FULL) {
-              |  this->$hookName($hookArguments);
+              |#if FW_PORT_SPAN_TRACING
+              |  Fw::PortTrace::dropped(*this, "$portName", portNum, _cause);
+              |#endif
+              |  this->incNumMsgDropped();
               |  return;
               |}
               |"""
         )
+        case None => lines(
+          """|if (qStatus == Os::Queue::Status::FULL) {
+             |  this->incNumMsgDropped();
+             |  return;
+             |}
+             |"""
+        )
+      }
+      case Ast.QueueFull.Hook =>
+        val hookName = inputOverflowHookName(hookBaseName, messageType)
+        val hookArguments = hookParams.map(_.name).mkString(", ")
+        tracePortNameOpt match {
+          case Some(portName) => lines(
+            s"""|if (qStatus == Os::Queue::Status::FULL) {
+                |#if FW_PORT_SPAN_TRACING
+                |  Fw::PortTrace::dropped(*this, "$portName", portNum, _cause);
+                |#endif
+                |  this->$hookName($hookArguments);
+                |  return;
+                |}
+                |"""
+          )
+          case None => lines(
+            s"""|if (qStatus == Os::Queue::Status::FULL) {
+                |  this->$hookName($hookArguments);
+                |  return;
+                |}
+                |"""
+          )
+        }
       case _ => Nil
     }
+  }
 
   def writeQueueAssert = lines(
     """|FW_ASSERT(
@@ -738,11 +764,18 @@ abstract class ComponentCppWriterUtils(
     priority: Option[BigInt],
     messageType: MessageType,
     hookBaseName: String,
-    hookParams: List[CppDoc.Function.Param]
+    hookParams: List[CppDoc.Function.Param],
+    tracePortNameOpt: Option[String] = None
   ): List[Line] = intersperseBlankLines(
     List(
       writeQueueSendLines(bufferName, queueFull, priority),
-      writeQueueFullLines(queueFull, messageType, hookBaseName, hookParams),
+      writeQueueFullLines(
+        queueFull,
+        messageType,
+        hookBaseName,
+        hookParams,
+        tracePortNameOpt
+      ),
       writeQueueAssert
     )
   )

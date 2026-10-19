@@ -84,7 +84,11 @@ namespace {
         // Max data size
         MAX_DATA_SIZE = sizeof(BuffUnion),
         // Max message size: Size of message id + size of port + max data size
+#if FW_PORT_SPAN_TRACING
+        SERIALIZATION_SIZE = DATA_OFFSET + MAX_DATA_SIZE + sizeof(Fw::TraceContext)
+#else
         SERIALIZATION_SIZE = DATA_OFFSET + MAX_DATA_SIZE
+#endif
       };
 
       ComponentIpcSerializableBuffer() : Fw::LinearBufferBase(m_buff, sizeof(m_buff)) {
@@ -3316,6 +3320,10 @@ void QueuedTestComponentBase ::
   );
   ComponentIpcSerializableBuffer msg;
   Fw::SerializeStatus _status = Fw::FW_SERIALIZE_OK;
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _cause;
+  Fw::PortTrace::current(_cause);
+#endif
 
   // Serialize message ID
   _status = msg.serializeFrom(
@@ -3332,6 +3340,18 @@ void QueuedTestComponentBase ::
     _status == Fw::FW_SERIALIZE_OK,
     static_cast<FwAssertArgType>(_status)
   );
+
+#if FW_PORT_SPAN_TRACING
+  _status = msg.serializeFrom(
+    reinterpret_cast<const U8*>(&_cause),
+    static_cast<FwSizeType>(sizeof(_cause)),
+    Fw::Serialization::OMIT_LENGTH
+  );
+  FW_ASSERT(
+    _status == Fw::FW_SERIALIZE_OK,
+    static_cast<FwAssertArgType>(_status)
+  );
+#endif
 
   // Serialize argument u32
   _status = msg.serializeFrom(u32);
@@ -3422,6 +3442,10 @@ void QueuedTestComponentBase ::
   noArgsAsync_preMsgHook(portNum);
   ComponentIpcSerializableBuffer msg;
   Fw::SerializeStatus _status = Fw::FW_SERIALIZE_OK;
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _cause;
+  Fw::PortTrace::current(_cause);
+#endif
 
   // Serialize message ID
   _status = msg.serializeFrom(
@@ -3438,6 +3462,18 @@ void QueuedTestComponentBase ::
     _status == Fw::FW_SERIALIZE_OK,
     static_cast<FwAssertArgType>(_status)
   );
+
+#if FW_PORT_SPAN_TRACING
+  _status = msg.serializeFrom(
+    reinterpret_cast<const U8*>(&_cause),
+    static_cast<FwSizeType>(sizeof(_cause)),
+    Fw::Serialization::OMIT_LENGTH
+  );
+  FW_ASSERT(
+    _status == Fw::FW_SERIALIZE_OK,
+    static_cast<FwAssertArgType>(_status)
+  );
+#endif
 
   // Send message
   Os::Queue::BlockingType _block = Os::Queue::NONBLOCKING;
@@ -3676,6 +3712,10 @@ void QueuedTestComponentBase ::
   );
   ComponentIpcSerializableBuffer msg;
   Fw::SerializeStatus _status = Fw::FW_SERIALIZE_OK;
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _cause;
+  Fw::PortTrace::current(_cause);
+#endif
 
   // Serialize message ID
   _status = msg.serializeFrom(
@@ -3692,6 +3732,18 @@ void QueuedTestComponentBase ::
     _status == Fw::FW_SERIALIZE_OK,
     static_cast<FwAssertArgType>(_status)
   );
+
+#if FW_PORT_SPAN_TRACING
+  _status = msg.serializeFrom(
+    reinterpret_cast<const U8*>(&_cause),
+    static_cast<FwSizeType>(sizeof(_cause)),
+    Fw::Serialization::OMIT_LENGTH
+  );
+  FW_ASSERT(
+    _status == Fw::FW_SERIALIZE_OK,
+    static_cast<FwAssertArgType>(_status)
+  );
+#endif
 
   // Serialize argument u32
   _status = msg.serializeFrom(u32);
@@ -3783,6 +3835,10 @@ void QueuedTestComponentBase ::
   );
   ComponentIpcSerializableBuffer msg;
   Fw::SerializeStatus _status = Fw::FW_SERIALIZE_OK;
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _cause;
+  Fw::PortTrace::current(_cause);
+#endif
 
   // Serialize message ID
   _status = msg.serializeFrom(
@@ -3799,6 +3855,18 @@ void QueuedTestComponentBase ::
     _status == Fw::FW_SERIALIZE_OK,
     static_cast<FwAssertArgType>(_status)
   );
+
+#if FW_PORT_SPAN_TRACING
+  _status = msg.serializeFrom(
+    reinterpret_cast<const U8*>(&_cause),
+    static_cast<FwSizeType>(sizeof(_cause)),
+    Fw::Serialization::OMIT_LENGTH
+  );
+  FW_ASSERT(
+    _status == Fw::FW_SERIALIZE_OK,
+    static_cast<FwAssertArgType>(_status)
+  );
+#endif
 
   // Serialize argument u32
   _status = msg.serializeFrom(u32);
@@ -3890,6 +3958,10 @@ void QueuedTestComponentBase ::
   );
   ComponentIpcSerializableBuffer msg;
   Fw::SerializeStatus _status = Fw::FW_SERIALIZE_OK;
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _cause;
+  Fw::PortTrace::current(_cause);
+#endif
 
   // Serialize message ID
   _status = msg.serializeFrom(
@@ -3906,6 +3978,18 @@ void QueuedTestComponentBase ::
     _status == Fw::FW_SERIALIZE_OK,
     static_cast<FwAssertArgType>(_status)
   );
+
+#if FW_PORT_SPAN_TRACING
+  _status = msg.serializeFrom(
+    reinterpret_cast<const U8*>(&_cause),
+    static_cast<FwSizeType>(sizeof(_cause)),
+    Fw::Serialization::OMIT_LENGTH
+  );
+  FW_ASSERT(
+    _status == Fw::FW_SERIALIZE_OK,
+    static_cast<FwAssertArgType>(_status)
+  );
+#endif
 
   // Serialize argument u32
   _status = msg.serializeFrom(u32);
@@ -3997,6 +4081,10 @@ void QueuedTestComponentBase ::
   );
   ComponentIpcSerializableBuffer msg;
   Fw::SerializeStatus _status = Fw::FW_SERIALIZE_OK;
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _cause;
+  Fw::PortTrace::current(_cause);
+#endif
 
   // Serialize message ID
   _status = msg.serializeFrom(
@@ -4013,6 +4101,18 @@ void QueuedTestComponentBase ::
     _status == Fw::FW_SERIALIZE_OK,
     static_cast<FwAssertArgType>(_status)
   );
+
+#if FW_PORT_SPAN_TRACING
+  _status = msg.serializeFrom(
+    reinterpret_cast<const U8*>(&_cause),
+    static_cast<FwSizeType>(sizeof(_cause)),
+    Fw::Serialization::OMIT_LENGTH
+  );
+  FW_ASSERT(
+    _status == Fw::FW_SERIALIZE_OK,
+    static_cast<FwAssertArgType>(_status)
+  );
+#endif
 
   // Serialize argument u32
   _status = msg.serializeFrom(u32);
@@ -4068,6 +4168,9 @@ void QueuedTestComponentBase ::
   Os::Queue::Status qStatus = this->m_queue.send(msg, 5, _block);
 
   if (qStatus == Os::Queue::Status::FULL) {
+#if FW_PORT_SPAN_TRACING
+    Fw::PortTrace::dropped(*this, "typedAsyncDropPriority", portNum, _cause);
+#endif
     this->incNumMsgDropped();
     return;
   }
@@ -4348,7 +4451,14 @@ void QueuedTestComponentBase ::
     this->m_noArgsOut_OutputPort[portNum].isConnected(),
     static_cast<FwAssertArgType>(portNum)
   );
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _span;
+  Fw::PortTrace::callBegin(*this, "noArgsOut", portNum, _span);
   this->m_noArgsOut_OutputPort[portNum].invoke();
+  Fw::PortTrace::callEnd(*this, "noArgsOut", portNum, _span);
+#else
+  this->m_noArgsOut_OutputPort[portNum].invoke();
+#endif
 }
 
 U32 QueuedTestComponentBase ::
@@ -4363,7 +4473,15 @@ U32 QueuedTestComponentBase ::
     this->m_noArgsReturnOut_OutputPort[portNum].isConnected(),
     static_cast<FwAssertArgType>(portNum)
   );
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _span;
+  Fw::PortTrace::callBegin(*this, "noArgsReturnOut", portNum, _span);
+  U32 _result = this->m_noArgsReturnOut_OutputPort[portNum].invoke();
+  Fw::PortTrace::callEnd(*this, "noArgsReturnOut", portNum, _span);
+  return _result;
+#else
   return this->m_noArgsReturnOut_OutputPort[portNum].invoke();
+#endif
 }
 
 Fw::String QueuedTestComponentBase ::
@@ -4378,7 +4496,15 @@ Fw::String QueuedTestComponentBase ::
     this->m_noArgsStringReturnOut_OutputPort[portNum].isConnected(),
     static_cast<FwAssertArgType>(portNum)
   );
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _span;
+  Fw::PortTrace::callBegin(*this, "noArgsStringReturnOut", portNum, _span);
+  Fw::String _result = this->m_noArgsStringReturnOut_OutputPort[portNum].invoke();
+  Fw::PortTrace::callEnd(*this, "noArgsStringReturnOut", portNum, _span);
+  return _result;
+#else
   return this->m_noArgsStringReturnOut_OutputPort[portNum].invoke();
+#endif
 }
 
 void QueuedTestComponentBase ::
@@ -4402,6 +4528,9 @@ void QueuedTestComponentBase ::
     this->m_typedAliasOut_OutputPort[portNum].isConnected(),
     static_cast<FwAssertArgType>(portNum)
   );
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _span;
+  Fw::PortTrace::callBegin(*this, "typedAliasOut", portNum, _span);
   this->m_typedAliasOut_OutputPort[portNum].invoke(
     u32,
     f32,
@@ -4411,6 +4540,18 @@ void QueuedTestComponentBase ::
     a,
     s
   );
+  Fw::PortTrace::callEnd(*this, "typedAliasOut", portNum, _span);
+#else
+  this->m_typedAliasOut_OutputPort[portNum].invoke(
+    u32,
+    f32,
+    b,
+    str2,
+    e,
+    a,
+    s
+  );
+#endif
 }
 
 AliasPrim2 QueuedTestComponentBase ::
@@ -4434,6 +4575,21 @@ AliasPrim2 QueuedTestComponentBase ::
     this->m_typedAliasReturnOut_OutputPort[portNum].isConnected(),
     static_cast<FwAssertArgType>(portNum)
   );
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _span;
+  Fw::PortTrace::callBegin(*this, "typedAliasReturnOut", portNum, _span);
+  AliasPrim2 _result = this->m_typedAliasReturnOut_OutputPort[portNum].invoke(
+    u32,
+    f32,
+    b,
+    str2,
+    e,
+    a,
+    s
+  );
+  Fw::PortTrace::callEnd(*this, "typedAliasReturnOut", portNum, _span);
+  return _result;
+#else
   return this->m_typedAliasReturnOut_OutputPort[portNum].invoke(
     u32,
     f32,
@@ -4443,6 +4599,7 @@ AliasPrim2 QueuedTestComponentBase ::
     a,
     s
   );
+#endif
 }
 
 Fw::String QueuedTestComponentBase ::
@@ -4466,6 +4623,21 @@ Fw::String QueuedTestComponentBase ::
     this->m_typedAliasReturnStringOut_OutputPort[portNum].isConnected(),
     static_cast<FwAssertArgType>(portNum)
   );
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _span;
+  Fw::PortTrace::callBegin(*this, "typedAliasReturnStringOut", portNum, _span);
+  Fw::String _result = this->m_typedAliasReturnStringOut_OutputPort[portNum].invoke(
+    u32,
+    f32,
+    b,
+    str2,
+    e,
+    a,
+    s
+  );
+  Fw::PortTrace::callEnd(*this, "typedAliasReturnStringOut", portNum, _span);
+  return _result;
+#else
   return this->m_typedAliasReturnStringOut_OutputPort[portNum].invoke(
     u32,
     f32,
@@ -4475,6 +4647,7 @@ Fw::String QueuedTestComponentBase ::
     a,
     s
   );
+#endif
 }
 
 void QueuedTestComponentBase ::
@@ -4498,6 +4671,9 @@ void QueuedTestComponentBase ::
     this->m_typedOut_OutputPort[portNum].isConnected(),
     static_cast<FwAssertArgType>(portNum)
   );
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _span;
+  Fw::PortTrace::callBegin(*this, "typedOut", portNum, _span);
   this->m_typedOut_OutputPort[portNum].invoke(
     u32,
     f32,
@@ -4507,6 +4683,18 @@ void QueuedTestComponentBase ::
     a,
     s
   );
+  Fw::PortTrace::callEnd(*this, "typedOut", portNum, _span);
+#else
+  this->m_typedOut_OutputPort[portNum].invoke(
+    u32,
+    f32,
+    b,
+    str1,
+    e,
+    a,
+    s
+  );
+#endif
 }
 
 F32 QueuedTestComponentBase ::
@@ -4530,6 +4718,21 @@ F32 QueuedTestComponentBase ::
     this->m_typedReturnOut_OutputPort[portNum].isConnected(),
     static_cast<FwAssertArgType>(portNum)
   );
+#if FW_PORT_SPAN_TRACING
+  Fw::TraceContext _span;
+  Fw::PortTrace::callBegin(*this, "typedReturnOut", portNum, _span);
+  F32 _result = this->m_typedReturnOut_OutputPort[portNum].invoke(
+    u32,
+    f32,
+    b,
+    str2,
+    e,
+    a,
+    s
+  );
+  Fw::PortTrace::callEnd(*this, "typedReturnOut", portNum, _span);
+  return _result;
+#else
   return this->m_typedReturnOut_OutputPort[portNum].invoke(
     u32,
     f32,
@@ -4539,6 +4742,7 @@ F32 QueuedTestComponentBase ::
     a,
     s
   );
+#endif
 }
 
 #endif
@@ -7370,6 +7574,20 @@ Fw::QueuedComponentBase::MsgDispatchStatus QueuedTestComponentBase ::
 
     // Handle async input port aliasTypedAsync
     case ALIASTYPEDASYNC_ALIASTYPED: {
+#if FW_PORT_SPAN_TRACING
+      Fw::TraceContext _cause;
+      FwSizeType _causeSize = static_cast<FwSizeType>(sizeof(_cause));
+      _deserStatus = _msg.deserializeTo(
+        reinterpret_cast<U8*>(&_cause),
+        _causeSize,
+        Fw::Serialization::OMIT_LENGTH
+      );
+      FW_ASSERT(
+        _deserStatus == Fw::FW_SERIALIZE_OK,
+        static_cast<FwAssertArgType>(_deserStatus)
+      );
+      Fw::TraceContext _span;
+#endif
       // Deserialize argument u32
       AliasPrim1 u32;
       _deserStatus = _msg.deserializeTo(u32);
@@ -7426,6 +7644,15 @@ Fw::QueuedComponentBase::MsgDispatchStatus QueuedTestComponentBase ::
         _deserStatus == Fw::FW_SERIALIZE_OK,
         static_cast<FwAssertArgType>(_deserStatus)
       );
+#if FW_PORT_SPAN_TRACING
+      Fw::PortTrace::dispatchBegin(
+        *this,
+        "aliasTypedAsync",
+        portNum,
+        _cause,
+        _span
+      );
+#endif
       // Call handler function
       this->aliasTypedAsync_handler(
         portNum,
@@ -7437,20 +7664,73 @@ Fw::QueuedComponentBase::MsgDispatchStatus QueuedTestComponentBase ::
         a,
         s
       );
+#if FW_PORT_SPAN_TRACING
+      Fw::PortTrace::dispatchEnd(
+        *this,
+        "aliasTypedAsync",
+        portNum,
+        _span
+      );
+#endif
 
       break;
     }
 
     // Handle async input port noArgsAsync
     case NOARGSASYNC_NOARGS: {
+#if FW_PORT_SPAN_TRACING
+      Fw::TraceContext _cause;
+      FwSizeType _causeSize = static_cast<FwSizeType>(sizeof(_cause));
+      _deserStatus = _msg.deserializeTo(
+        reinterpret_cast<U8*>(&_cause),
+        _causeSize,
+        Fw::Serialization::OMIT_LENGTH
+      );
+      FW_ASSERT(
+        _deserStatus == Fw::FW_SERIALIZE_OK,
+        static_cast<FwAssertArgType>(_deserStatus)
+      );
+      Fw::TraceContext _span;
+#endif
+#if FW_PORT_SPAN_TRACING
+      Fw::PortTrace::dispatchBegin(
+        *this,
+        "noArgsAsync",
+        portNum,
+        _cause,
+        _span
+      );
+#endif
       // Call handler function
       this->noArgsAsync_handler(portNum);
+#if FW_PORT_SPAN_TRACING
+      Fw::PortTrace::dispatchEnd(
+        *this,
+        "noArgsAsync",
+        portNum,
+        _span
+      );
+#endif
 
       break;
     }
 
     // Handle async input port typedAsync
     case TYPEDASYNC_TYPED: {
+#if FW_PORT_SPAN_TRACING
+      Fw::TraceContext _cause;
+      FwSizeType _causeSize = static_cast<FwSizeType>(sizeof(_cause));
+      _deserStatus = _msg.deserializeTo(
+        reinterpret_cast<U8*>(&_cause),
+        _causeSize,
+        Fw::Serialization::OMIT_LENGTH
+      );
+      FW_ASSERT(
+        _deserStatus == Fw::FW_SERIALIZE_OK,
+        static_cast<FwAssertArgType>(_deserStatus)
+      );
+      Fw::TraceContext _span;
+#endif
       // Deserialize argument u32
       U32 u32;
       _deserStatus = _msg.deserializeTo(u32);
@@ -7507,6 +7787,15 @@ Fw::QueuedComponentBase::MsgDispatchStatus QueuedTestComponentBase ::
         _deserStatus == Fw::FW_SERIALIZE_OK,
         static_cast<FwAssertArgType>(_deserStatus)
       );
+#if FW_PORT_SPAN_TRACING
+      Fw::PortTrace::dispatchBegin(
+        *this,
+        "typedAsync",
+        portNum,
+        _cause,
+        _span
+      );
+#endif
       // Call handler function
       this->typedAsync_handler(
         portNum,
@@ -7518,12 +7807,34 @@ Fw::QueuedComponentBase::MsgDispatchStatus QueuedTestComponentBase ::
         a,
         s
       );
+#if FW_PORT_SPAN_TRACING
+      Fw::PortTrace::dispatchEnd(
+        *this,
+        "typedAsync",
+        portNum,
+        _span
+      );
+#endif
 
       break;
     }
 
     // Handle async input port typedAsyncAssert
     case TYPEDASYNCASSERT_TYPED: {
+#if FW_PORT_SPAN_TRACING
+      Fw::TraceContext _cause;
+      FwSizeType _causeSize = static_cast<FwSizeType>(sizeof(_cause));
+      _deserStatus = _msg.deserializeTo(
+        reinterpret_cast<U8*>(&_cause),
+        _causeSize,
+        Fw::Serialization::OMIT_LENGTH
+      );
+      FW_ASSERT(
+        _deserStatus == Fw::FW_SERIALIZE_OK,
+        static_cast<FwAssertArgType>(_deserStatus)
+      );
+      Fw::TraceContext _span;
+#endif
       // Deserialize argument u32
       U32 u32;
       _deserStatus = _msg.deserializeTo(u32);
@@ -7580,6 +7891,15 @@ Fw::QueuedComponentBase::MsgDispatchStatus QueuedTestComponentBase ::
         _deserStatus == Fw::FW_SERIALIZE_OK,
         static_cast<FwAssertArgType>(_deserStatus)
       );
+#if FW_PORT_SPAN_TRACING
+      Fw::PortTrace::dispatchBegin(
+        *this,
+        "typedAsyncAssert",
+        portNum,
+        _cause,
+        _span
+      );
+#endif
       // Call handler function
       this->typedAsyncAssert_handler(
         portNum,
@@ -7591,12 +7911,34 @@ Fw::QueuedComponentBase::MsgDispatchStatus QueuedTestComponentBase ::
         a,
         s
       );
+#if FW_PORT_SPAN_TRACING
+      Fw::PortTrace::dispatchEnd(
+        *this,
+        "typedAsyncAssert",
+        portNum,
+        _span
+      );
+#endif
 
       break;
     }
 
     // Handle async input port typedAsyncBlockPriority
     case TYPEDASYNCBLOCKPRIORITY_TYPED: {
+#if FW_PORT_SPAN_TRACING
+      Fw::TraceContext _cause;
+      FwSizeType _causeSize = static_cast<FwSizeType>(sizeof(_cause));
+      _deserStatus = _msg.deserializeTo(
+        reinterpret_cast<U8*>(&_cause),
+        _causeSize,
+        Fw::Serialization::OMIT_LENGTH
+      );
+      FW_ASSERT(
+        _deserStatus == Fw::FW_SERIALIZE_OK,
+        static_cast<FwAssertArgType>(_deserStatus)
+      );
+      Fw::TraceContext _span;
+#endif
       // Deserialize argument u32
       U32 u32;
       _deserStatus = _msg.deserializeTo(u32);
@@ -7653,6 +7995,15 @@ Fw::QueuedComponentBase::MsgDispatchStatus QueuedTestComponentBase ::
         _deserStatus == Fw::FW_SERIALIZE_OK,
         static_cast<FwAssertArgType>(_deserStatus)
       );
+#if FW_PORT_SPAN_TRACING
+      Fw::PortTrace::dispatchBegin(
+        *this,
+        "typedAsyncBlockPriority",
+        portNum,
+        _cause,
+        _span
+      );
+#endif
       // Call handler function
       this->typedAsyncBlockPriority_handler(
         portNum,
@@ -7664,12 +8015,34 @@ Fw::QueuedComponentBase::MsgDispatchStatus QueuedTestComponentBase ::
         a,
         s
       );
+#if FW_PORT_SPAN_TRACING
+      Fw::PortTrace::dispatchEnd(
+        *this,
+        "typedAsyncBlockPriority",
+        portNum,
+        _span
+      );
+#endif
 
       break;
     }
 
     // Handle async input port typedAsyncDropPriority
     case TYPEDASYNCDROPPRIORITY_TYPED: {
+#if FW_PORT_SPAN_TRACING
+      Fw::TraceContext _cause;
+      FwSizeType _causeSize = static_cast<FwSizeType>(sizeof(_cause));
+      _deserStatus = _msg.deserializeTo(
+        reinterpret_cast<U8*>(&_cause),
+        _causeSize,
+        Fw::Serialization::OMIT_LENGTH
+      );
+      FW_ASSERT(
+        _deserStatus == Fw::FW_SERIALIZE_OK,
+        static_cast<FwAssertArgType>(_deserStatus)
+      );
+      Fw::TraceContext _span;
+#endif
       // Deserialize argument u32
       U32 u32;
       _deserStatus = _msg.deserializeTo(u32);
@@ -7726,6 +8099,15 @@ Fw::QueuedComponentBase::MsgDispatchStatus QueuedTestComponentBase ::
         _deserStatus == Fw::FW_SERIALIZE_OK,
         static_cast<FwAssertArgType>(_deserStatus)
       );
+#if FW_PORT_SPAN_TRACING
+      Fw::PortTrace::dispatchBegin(
+        *this,
+        "typedAsyncDropPriority",
+        portNum,
+        _cause,
+        _span
+      );
+#endif
       // Call handler function
       this->typedAsyncDropPriority_handler(
         portNum,
@@ -7737,6 +8119,14 @@ Fw::QueuedComponentBase::MsgDispatchStatus QueuedTestComponentBase ::
         a,
         s
       );
+#if FW_PORT_SPAN_TRACING
+      Fw::PortTrace::dispatchEnd(
+        *this,
+        "typedAsyncDropPriority",
+        portNum,
+        _span
+      );
+#endif
 
       break;
     }
