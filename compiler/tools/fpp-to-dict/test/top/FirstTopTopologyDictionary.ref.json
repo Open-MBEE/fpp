@@ -1272,5 +1272,20 @@
       ],
       "annotation" : "Pre annotation for Packets"
     }
+  ],
+  "connections" : [
+    {
+      "graph" : "C",
+      "source" : {
+        "instance" : "Module1.myFirstC1",
+        "port" : "pOut",
+        "index" : 0
+      },
+      "destination" : {
+        "instance" : "Module1.myFirstC2",
+        "port" : "pIn",
+        "index" : 0
+      }
+    }
   ]
 }

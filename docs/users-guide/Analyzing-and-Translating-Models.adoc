@@ -1002,7 +1002,10 @@ For example, for a system `S` defined in module `M`,
 the file name is `M_SSystemDictionary.json`.
 The generated dictionary records all the definitions in the
 single deployment topology referred to by _S_.
-The dictionary is specified in JavaScript Object Notation (JSON) format.
+Each generated dictionary is specified in JavaScript Object Notation (JSON)
+format and contains a `connections` array listing each resolved connection's
+graph, source, and destination. Each endpoint records the qualified component
+instance name, port name, and resolved port index.
 The JSON format is specified in the
 https://fprime.jpl.nasa.gov/devel/docs/reference/fpp-json-dict/[F Prime design
 documentation].

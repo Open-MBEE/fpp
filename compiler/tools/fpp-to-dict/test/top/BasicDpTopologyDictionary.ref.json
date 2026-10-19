@@ -600,5 +600,20 @@
     }
   ],
   "telemetryPacketSets" : [
+  ],
+  "connections" : [
+    {
+      "graph" : "C",
+      "source" : {
+        "instance" : "FppTest.c1",
+        "port" : "pOut",
+        "index" : 0
+      },
+      "destination" : {
+        "instance" : "FppTest.c2",
+        "port" : "pIn",
+        "index" : 0
+      }
+    }
   ]
 }

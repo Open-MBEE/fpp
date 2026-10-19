@@ -125,6 +125,45 @@
                 "group",
                 "members"
             ]
+        },
+        "connectionEndpoint": {
+            "type": "object",
+            "properties": {
+                "instance": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "string"
+                },
+                "index": {
+                    "type": "integer",
+                    "minimum": 0
+                }
+            },
+            "required": [
+                "instance",
+                "port",
+                "index"
+            ]
+        },
+        "connection": {
+            "type": "object",
+            "properties": {
+                "graph": {
+                    "type": "string"
+                },
+                "source": {
+                    "$ref": "#/$defs/connectionEndpoint"
+                },
+                "destination": {
+                    "$ref": "#/$defs/connectionEndpoint"
+                }
+            },
+            "required": [
+                "graph",
+                "source",
+                "destination"
+            ]
         }
     },
     "properties": {
@@ -149,6 +188,12 @@
                 "dictionarySpecVersion": {
                     "type": "string"
                 }
+            }
+        },
+        "connections": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/connection"
             }
         },
         "typeDefinitions": {

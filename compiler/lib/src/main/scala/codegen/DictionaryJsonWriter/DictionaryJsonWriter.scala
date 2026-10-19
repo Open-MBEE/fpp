@@ -65,7 +65,8 @@ object DictionaryJsonWriter extends AstStateVisitor {
         val metadata = s.metadata.copy(deploymentName = deploymentName)
         val encoder = DictionaryJsonEncoder(
             dictionary,
-            s.copy(metadata = metadata)
+            s.copy(metadata = metadata),
+            s.a.topologyMap(topSymbol)
         )
         encoder.dictionaryAsJson
     }

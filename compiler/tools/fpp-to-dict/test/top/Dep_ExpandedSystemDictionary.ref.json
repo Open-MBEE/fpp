@@ -346,5 +346,7 @@
   "containers" : [
   ],
   "telemetryPacketSets" : [
+  ],
+  "connections" : [
   ]
 }

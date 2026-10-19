@@ -27,7 +27,9 @@ case class DictionaryJsonEncoder(
     /** Constructed Dictionary data structure */
     dictionary: Dictionary,
     /** Dictionary State */
-    dictionaryState: DictionaryJsonEncoderState
+    dictionaryState: DictionaryJsonEncoderState,
+    /** Resolved topology data */
+    topology: Topology
 ) {
     /** Dictionary entry map to JSON */
     private def dictionaryEntryMapAsJson[T] (f: (BigInt, T) => Json) (map: Map[BigInt, T]): Json =
@@ -40,6 +42,31 @@ case class DictionaryJsonEncoder(
     /** Dictionary symbol set to JSON */
     private def dictionarySymbolSetAsJson[A] (f: A => Json) (set: Set[A]): Json =
         (set.map(f)).toList.asJson
+
+    private def connectionEndpointAsJson(endpoint: Connection.Endpoint, index: Int): Json =
+        Json.obj(
+            "instance" -> endpoint.port.interfaceInstance.getQualifiedName.toString.asJson,
+            "port" -> endpoint.port.portInstance.getUnqualifiedName.toString.asJson,
+            "index" -> index.asJson
+        )
+
+    private def connectionsAsJson: Json =
+        topology.connectionMap.toList.sortBy(_._1).flatMap {
+            case (graphName, connections) =>
+                topology.sortConnections(connections).map { connection =>
+                    Json.obj(
+                        "graph" -> graphName.toString.asJson,
+                        "source" -> connectionEndpointAsJson(
+                            connection.from,
+                            topology.fromPortNumberMap(connection)
+                        ),
+                        "destination" -> connectionEndpointAsJson(
+                            connection.to,
+                            topology.toPortNumberMap(connection)
+                        )
+                    )
+                }
+        }.asJson
     
     /** Enum Constant JSON Encoding */
     private def enumConstantAsJson(aNode: AstNode[Ast.DefEnumConstant]): Map[String, Json] = {
@@ -609,7 +636,8 @@ case class DictionaryJsonEncoder(
             "telemetryChannels" -> dictionary.tlmChannelEntryMap.asJson,
             "records" -> dictionary.recordEntryMap.asJson,
             "containers" -> dictionary.containerEntryMap.asJson,
-            "telemetryPacketSets" -> dictionary.tlmPacketSetMap.asJson
+            "telemetryPacketSets" -> dictionary.tlmPacketSetMap.asJson,
+            "connections" -> connectionsAsJson
         )
     }
 

@@ -1242,5 +1242,20 @@
     }
   ],
   "telemetryPacketSets" : [
+  ],
+  "connections" : [
+    {
+      "graph" : "C",
+      "source" : {
+        "instance" : "Module1.mySecondC1",
+        "port" : "pOut",
+        "index" : 0
+      },
+      "destination" : {
+        "instance" : "Module1.mySecondC2",
+        "port" : "pIn",
+        "index" : 0
+      }
+    }
   ]
 }
