@@ -82,6 +82,27 @@ namespace M {
 #endif
 
   }
+#if FW_PORT_SPAN_TRACING
+  FwIndexType getConnectionId(
+    FwEnumStoreType instanceId,
+    FwIndexType portId,
+    FwIndexType portNum
+  ) {
+   switch (instanceId) {
+     case InstanceIds::M_cmdDispatcher:
+      switch (portId) {
+        case M::CmdDispatcherComponentBase::PORT_TRACE_ID_CMDOUT:
+         switch (portNum) {
+           case 0: return 2;
+           default: return -1;
+         }
+        default: return -1;
+      }
+     default: return -1;
+   }
+   return -1;
+  }
+#endif
 
   void regCommands() {
     M::c1.regCommandsSpecial();
@@ -341,7 +362,7 @@ namespace M {
     );
 #if FW_PORT_SPAN_TRACING
     Fw::TraceContext _span;
-    Fw::PortTrace::callBegin(*this, "cmdOut", portNum, _span);
+    Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_CMDOUT, portNum, _span);
 #endif
     switch (portNum) {
       case 0:
@@ -357,7 +378,7 @@ namespace M {
         break;
     }
 #if FW_PORT_SPAN_TRACING
-    Fw::PortTrace::callEnd(*this, "cmdOut", portNum, _span);
+    Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_CMDOUT, portNum, _span);
 #endif
   }
 

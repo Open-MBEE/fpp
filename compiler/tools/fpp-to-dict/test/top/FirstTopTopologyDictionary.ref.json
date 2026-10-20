@@ -1275,15 +1275,20 @@
   ],
   "connections" : [
     {
+      "id" : 0,
       "graph" : "C",
       "source" : {
         "instance" : "Module1.myFirstC1",
+        "instanceId" : 0,
         "port" : "pOut",
+        "portId" : 0,
         "index" : 0
       },
       "destination" : {
         "instance" : "Module1.myFirstC2",
+        "instanceId" : 1,
         "port" : "pIn",
+        "portId" : 0,
         "index" : 0
       }
     }

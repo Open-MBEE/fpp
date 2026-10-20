@@ -30,6 +30,19 @@ class ActiveNoArgsPortsOnlyComponentBase :
   public Fw::ActiveComponentBase
 {
 
+  public:
+#if FW_PORT_SPAN_TRACING
+    //! Port span tracing identifiers
+    enum {
+      PORT_TRACE_ID_NOARGSASYNC = 0,
+      PORT_TRACE_ID_NOARGSGUARDED = 1,
+      PORT_TRACE_ID_NOARGSOUT = 2,
+      PORT_TRACE_ID_NOARGSRETURNGUARDED = 3,
+      PORT_TRACE_ID_NOARGSRETURNOUT = 4,
+      PORT_TRACE_ID_NOARGSRETURNSYNC = 5,
+    };
+#endif
+
     // ----------------------------------------------------------------------
     // Friend classes
     // ----------------------------------------------------------------------

@@ -531,9 +531,9 @@ void QueuedNoArgsPortsOnlyComponentBase ::
   );
 #if FW_PORT_SPAN_TRACING
   Fw::TraceContext _span;
-  Fw::PortTrace::callBegin(*this, "noArgsOut", portNum, _span);
+  Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_NOARGSOUT, portNum, _span);
   this->m_noArgsOut_OutputPort[portNum].invoke();
-  Fw::PortTrace::callEnd(*this, "noArgsOut", portNum, _span);
+  Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_NOARGSOUT, portNum, _span);
 #else
   this->m_noArgsOut_OutputPort[portNum].invoke();
 #endif
@@ -553,9 +553,9 @@ U32 QueuedNoArgsPortsOnlyComponentBase ::
   );
 #if FW_PORT_SPAN_TRACING
   Fw::TraceContext _span;
-  Fw::PortTrace::callBegin(*this, "noArgsReturnOut", portNum, _span);
+  Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_NOARGSRETURNOUT, portNum, _span);
   U32 _result = this->m_noArgsReturnOut_OutputPort[portNum].invoke();
-  Fw::PortTrace::callEnd(*this, "noArgsReturnOut", portNum, _span);
+  Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_NOARGSRETURNOUT, portNum, _span);
   return _result;
 #else
   return this->m_noArgsReturnOut_OutputPort[portNum].invoke();
@@ -651,7 +651,7 @@ Fw::QueuedComponentBase::MsgDispatchStatus QueuedNoArgsPortsOnlyComponentBase ::
 #if FW_PORT_SPAN_TRACING
       Fw::PortTrace::dispatchBegin(
         *this,
-        "noArgsAsync",
+        PORT_TRACE_ID_NOARGSASYNC,
         portNum,
         _cause,
         _span
@@ -662,7 +662,7 @@ Fw::QueuedComponentBase::MsgDispatchStatus QueuedNoArgsPortsOnlyComponentBase ::
 #if FW_PORT_SPAN_TRACING
       Fw::PortTrace::dispatchEnd(
         *this,
-        "noArgsAsync",
+        PORT_TRACE_ID_NOARGSASYNC,
         portNum,
         _span
       );

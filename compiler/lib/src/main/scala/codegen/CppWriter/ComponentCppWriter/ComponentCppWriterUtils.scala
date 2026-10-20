@@ -35,6 +35,9 @@ abstract class ComponentCppWriterUtils(
     Some("The port number")
   )
 
+  def portTraceIdName(portName: Name.Unqualified): String =
+    s"PORT_TRACE_ID_${portName.toString.toUpperCase}"
+
   /** Opcode param as a CppDoc Function Param */
   val opcodeParam: CppDoc.Function.Param = CppDoc.Function.Param(
     CppDoc.Type("FwOpcodeType"),
@@ -701,14 +704,14 @@ abstract class ComponentCppWriterUtils(
     messageType: MessageType,
     hookBaseName: String,
     hookParams: List[CppDoc.Function.Param],
-    tracePortNameOpt: Option[String] = None
+    tracePortIdNameOpt: Option[String] = None
   ): List[Line] = {
     queueFull match {
-      case Ast.QueueFull.Drop => tracePortNameOpt match {
-        case Some(portName) => lines(
+      case Ast.QueueFull.Drop => tracePortIdNameOpt match {
+        case Some(portIdName) => lines(
           s"""|if (qStatus == Os::Queue::Status::FULL) {
               |#if FW_PORT_SPAN_TRACING
-              |  Fw::PortTrace::dropped(*this, "$portName", portNum, _cause);
+              |  Fw::PortTrace::dropped(*this, $portIdName, portNum, _cause);
               |#endif
               |  this->incNumMsgDropped();
               |  return;
@@ -726,11 +729,11 @@ abstract class ComponentCppWriterUtils(
       case Ast.QueueFull.Hook =>
         val hookName = inputOverflowHookName(hookBaseName, messageType)
         val hookArguments = hookParams.map(_.name).mkString(", ")
-        tracePortNameOpt match {
-          case Some(portName) => lines(
+        tracePortIdNameOpt match {
+          case Some(portIdName) => lines(
             s"""|if (qStatus == Os::Queue::Status::FULL) {
                 |#if FW_PORT_SPAN_TRACING
-                |  Fw::PortTrace::dropped(*this, "$portName", portNum, _cause);
+                |  Fw::PortTrace::dropped(*this, $portIdName, portNum, _cause);
                 |#endif
                 |  this->$hookName($hookArguments);
                 |  return;
@@ -765,7 +768,7 @@ abstract class ComponentCppWriterUtils(
     messageType: MessageType,
     hookBaseName: String,
     hookParams: List[CppDoc.Function.Param],
-    tracePortNameOpt: Option[String] = None
+    tracePortIdNameOpt: Option[String] = None
   ): List[Line] = intersperseBlankLines(
     List(
       writeQueueSendLines(bufferName, queueFull, priority),
@@ -774,7 +777,7 @@ abstract class ComponentCppWriterUtils(
         messageType,
         hookBaseName,
         hookParams,
-        tracePortNameOpt
+        tracePortIdNameOpt
       ),
       writeQueueAssert
     )

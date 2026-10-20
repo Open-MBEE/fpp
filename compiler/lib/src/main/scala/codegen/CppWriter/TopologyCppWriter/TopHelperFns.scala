@@ -40,6 +40,7 @@ case class TopHelperFns(
       getConfigComponentsFn,
       getSetBaseIdsFn,
       getConnectComponentsFn,
+      getConnectionIdFn,
       getRegCommandsFn,
       getReadParametersFn,
       getLoadParametersFn,
@@ -92,6 +93,66 @@ case class TopHelperFns(
       instances.flatMap(getCode)
     )
     (name, memberOpt)
+  }
+
+  private def getConnectionIdFn = {
+    val traceConnections = t.connections.zipWithIndex.flatMap {
+      case ((_, connection), id) =>
+        val ci = connection.from.port.interfaceInstance.getComponentInstanceOpt.get
+        val portName = connection.from.port.portInstance.getUnqualifiedName
+        ci.component.portTraceIdMap.get(portName).map { portId =>
+          (ci, portId, t.fromPortNumberMap(connection), id)
+        }
+    }
+    val body = if (traceConnections.isEmpty) {
+      lines("return -1;")
+    } else {
+      val instanceCases = instances.filter(ci =>
+        traceConnections.exists(_._1 == ci)
+      ).flatMap { ci =>
+        val portIds = traceConnections.filter(_._1 == ci).map(_._2).distinct.sorted
+        val portIdCases = portIds.flatMap { portId =>
+          val portName = ci.component.portTraceIdMap.find(_._2 == portId).get._1
+          val componentBase = s"${getComponentNameAsQualIdent(ci)}ComponentBase"
+          val portNumCases = traceConnections
+            .filter(entry => entry._1 == ci && entry._2 == portId)
+            .sortBy(_._3)
+            .map { case (_, _, portNum, connectionId) =>
+              line(s"case $portNum: return $connectionId;")
+            }
+          List(
+            line(s"case $componentBase::PORT_TRACE_ID_${portName.toString.toUpperCase}:")
+          ) ::: wrapInSwitch(
+            "portNum",
+            portNumCases ::: lines("default: return -1;")
+          ).map(_.indentIn(1))
+        }
+        List(
+          line(s"case InstanceIds::${CppWriter.identFromQualifiedName(ci.qualifiedName)}:")
+        ) ::: wrapInSwitch(
+          "portId",
+          portIdCases ::: lines("default: return -1;")
+        ).map(_.indentIn(1))
+      }
+      wrapInSwitch(
+        "instanceId",
+        instanceCases ::: lines("default: return -1;")
+      ) ::: lines("return -1;")
+    }
+    val functionLines = List.concat(
+      lines("#if FW_PORT_SPAN_TRACING"),
+      lines(
+        """|FwIndexType getConnectionId(
+           |  FwEnumStoreType instanceId,
+           |  FwIndexType portId,
+           |  FwIndexType portNum
+           |) {"""
+      ),
+      body.map(_.indentIn(1)),
+      lines("}"),
+      lines("#endif")
+    )
+    ("getConnectionId", Some(linesMember(functionLines, CppDoc.Lines.Cpp)))
   }
 
   private def getConfigComponentsFn = {

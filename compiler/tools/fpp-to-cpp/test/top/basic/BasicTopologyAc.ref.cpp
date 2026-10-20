@@ -109,6 +109,36 @@ namespace M {
 #endif
 
   }
+#if FW_PORT_SPAN_TRACING
+  FwIndexType getConnectionId(
+    FwEnumStoreType instanceId,
+    FwIndexType portId,
+    FwIndexType portNum
+  ) {
+   switch (instanceId) {
+     case InstanceIds::M_passive1:
+      switch (portId) {
+        case M::PassiveComponentBase::PORT_TRACE_ID_P:
+         switch (portNum) {
+           case 0: return 0;
+           default: return -1;
+         }
+        default: return -1;
+      }
+     case InstanceIds::M_passive2:
+      switch (portId) {
+        case M::PassiveComponentBase::PORT_TRACE_ID_P:
+         switch (portNum) {
+           case 0: return 1;
+           default: return -1;
+         }
+        default: return -1;
+      }
+     default: return -1;
+   }
+   return -1;
+  }
+#endif
 
   void regCommands() {
     // Nothing to do
@@ -265,7 +295,7 @@ namespace M {
     );
 #if FW_PORT_SPAN_TRACING
     Fw::TraceContext _span;
-    Fw::PortTrace::callBegin(*this, "p", portNum, _span);
+    Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_P, portNum, _span);
 #endif
     const auto instance = this->getInstance();
     switch (instance) {
@@ -298,7 +328,7 @@ namespace M {
         break;
     }
 #if FW_PORT_SPAN_TRACING
-    Fw::PortTrace::callEnd(*this, "p", portNum, _span);
+    Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_P, portNum, _span);
 #endif
   }
 

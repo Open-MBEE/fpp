@@ -1004,8 +1004,11 @@ The generated dictionary records all the definitions in the
 single deployment topology referred to by _S_.
 Each generated dictionary is specified in JavaScript Object Notation (JSON)
 format and contains a `connections` array listing each resolved connection's
-graph, source, and destination. Each endpoint records the qualified component
-instance name, port name, and resolved port index.
+numeric dictionary id, graph, source, and destination. Each endpoint records
+the qualified component instance name and its numeric instance id, port name,
+resolved port index, and a numeric port id when the port is eligible for span
+tracing. Numeric identifiers are meaningful only with the dictionary produced
+for the same topology build.
 The JSON format is specified in the
 https://fprime.jpl.nasa.gov/devel/docs/reference/fpp-json-dict/[F Prime design
 documentation].
@@ -1703,4 +1706,3 @@ include "Commands.fppi"
 
 Separately, you can use `fpp-from-xml` to translate `Commands.xml`
 to `Commands.fppi`.
-

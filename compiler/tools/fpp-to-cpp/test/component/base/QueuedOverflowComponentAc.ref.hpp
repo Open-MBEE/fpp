@@ -45,6 +45,17 @@ class QueuedOverflowComponentBase :
   public Fw::QueuedComponentBase
 {
 
+  public:
+#if FW_PORT_SPAN_TRACING
+    //! Port span tracing identifiers
+    enum {
+      PORT_TRACE_ID_ASSERTASYNC = 0,
+      PORT_TRACE_ID_BLOCKASYNC = 1,
+      PORT_TRACE_ID_DROPASYNC = 2,
+      PORT_TRACE_ID_HOOKASYNC = 3,
+    };
+#endif
+
     // ----------------------------------------------------------------------
     // Friend classes
     // ----------------------------------------------------------------------

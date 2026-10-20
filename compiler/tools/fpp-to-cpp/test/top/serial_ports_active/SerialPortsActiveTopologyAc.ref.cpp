@@ -106,6 +106,30 @@ namespace SerialPortsActive {
 #endif
 
   }
+#if FW_PORT_SPAN_TRACING
+  FwIndexType getConnectionId(
+    FwEnumStoreType instanceId,
+    FwIndexType portId,
+    FwIndexType portNum
+  ) {
+   switch (instanceId) {
+     case InstanceIds::SerialPortsActive_sender:
+      switch (portId) {
+        case SerialPortsActive::Components::SenderComponentBase::PORT_TRACE_ID_PTYPED:
+         switch (portNum) {
+           case 0: return 8;
+           case 1: return 9;
+           case 2: return 10;
+           case 3: return 11;
+           default: return -1;
+         }
+        default: return -1;
+      }
+     default: return -1;
+   }
+   return -1;
+  }
+#endif
 
   void regCommands() {
     // Nothing to do
@@ -369,7 +393,7 @@ namespace SerialPortsActive {
       );
 #if FW_PORT_SPAN_TRACING
       Fw::TraceContext _span;
-      Fw::PortTrace::callBegin(*this, "pTyped", portNum, _span);
+      Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_PTYPED, portNum, _span);
 #endif
       switch (portNum) {
         case 0:
@@ -421,7 +445,7 @@ namespace SerialPortsActive {
           break;
       }
 #if FW_PORT_SPAN_TRACING
-      Fw::PortTrace::callEnd(*this, "pTyped", portNum, _span);
+      Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_PTYPED, portNum, _span);
 #endif
     }
 

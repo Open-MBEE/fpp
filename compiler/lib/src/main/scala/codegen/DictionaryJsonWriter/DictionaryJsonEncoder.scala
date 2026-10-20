@@ -43,29 +43,37 @@ case class DictionaryJsonEncoder(
     private def dictionarySymbolSetAsJson[A] (f: A => Json) (set: Set[A]): Json =
         (set.map(f)).toList.asJson
 
-    private def connectionEndpointAsJson(endpoint: Connection.Endpoint, index: Int): Json =
-        Json.obj(
-            "instance" -> endpoint.port.interfaceInstance.getQualifiedName.toString.asJson,
-            "port" -> endpoint.port.portInstance.getUnqualifiedName.toString.asJson,
+    private def connectionEndpointAsJson(endpoint: Connection.Endpoint, index: Int): Json = {
+        val instance = endpoint.port.interfaceInstance
+        val componentInstance = instance.getComponentInstanceOpt.get
+        val portName = endpoint.port.portInstance.getUnqualifiedName
+        val fields = List(
+            "instance" -> instance.getQualifiedName.toString.asJson,
+            "instanceId" -> topology.componentInstanceIdMap(componentInstance).asJson,
+            "port" -> portName.toString.asJson
+        ) ++ componentInstance.component.portTraceIdMap.get(portName).toList.map { portId =>
+            "portId" -> portId.asJson
+        } ++ List(
             "index" -> index.asJson
         )
+        Json.obj(fields*)
+    }
 
     private def connectionsAsJson: Json =
-        topology.connectionMap.toList.sortBy(_._1).flatMap {
-            case (graphName, connections) =>
-                topology.sortConnections(connections).map { connection =>
-                    Json.obj(
-                        "graph" -> graphName.toString.asJson,
-                        "source" -> connectionEndpointAsJson(
-                            connection.from,
-                            topology.fromPortNumberMap(connection)
-                        ),
-                        "destination" -> connectionEndpointAsJson(
-                            connection.to,
-                            topology.toPortNumberMap(connection)
-                        )
+        topology.connections.zipWithIndex.map {
+            case ((graphName, connection), id) =>
+                Json.obj(
+                    "id" -> id.asJson,
+                    "graph" -> graphName.toString.asJson,
+                    "source" -> connectionEndpointAsJson(
+                        connection.from,
+                        topology.fromPortNumberMap(connection)
+                    ),
+                    "destination" -> connectionEndpointAsJson(
+                        connection.to,
+                        topology.toPortNumberMap(connection)
                     )
-                }
+                )
         }.asJson
     
     /** Enum Constant JSON Encoding */

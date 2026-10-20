@@ -118,6 +118,70 @@ namespace TypedPortsActive {
 #endif
 
   }
+#if FW_PORT_SPAN_TRACING
+  FwIndexType getConnectionId(
+    FwEnumStoreType instanceId,
+    FwIndexType portId,
+    FwIndexType portNum
+  ) {
+   switch (instanceId) {
+     case InstanceIds::TypedPortsActive_sender:
+      switch (portId) {
+        case TypedPortsActive::SenderComponentBase::PORT_TRACE_ID_P1:
+         switch (portNum) {
+           case 0: return 0;
+           case 1: return 1;
+           default: return -1;
+         }
+        case TypedPortsActive::SenderComponentBase::PORT_TRACE_ID_P2:
+         switch (portNum) {
+           case 0: return 2;
+           case 1: return 3;
+           default: return -1;
+         }
+        case TypedPortsActive::SenderComponentBase::PORT_TRACE_ID_P3:
+         switch (portNum) {
+           case 0: return 4;
+           case 1: return 5;
+           default: return -1;
+         }
+        case TypedPortsActive::SenderComponentBase::PORT_TRACE_ID_P4:
+         switch (portNum) {
+           case 0: return 6;
+           case 1: return 7;
+           default: return -1;
+         }
+        case TypedPortsActive::SenderComponentBase::PORT_TRACE_ID_P5:
+         switch (portNum) {
+           case 0: return 8;
+           case 1: return 9;
+           default: return -1;
+         }
+        case TypedPortsActive::SenderComponentBase::PORT_TRACE_ID_P6:
+         switch (portNum) {
+           case 0: return 10;
+           case 1: return 11;
+           default: return -1;
+         }
+        case TypedPortsActive::SenderComponentBase::PORT_TRACE_ID_P7:
+         switch (portNum) {
+           case 0: return 12;
+           case 1: return 13;
+           default: return -1;
+         }
+        case TypedPortsActive::SenderComponentBase::PORT_TRACE_ID_P8:
+         switch (portNum) {
+           case 0: return 14;
+           case 1: return 15;
+           default: return -1;
+         }
+        default: return -1;
+      }
+     default: return -1;
+   }
+   return -1;
+  }
+#endif
 
   void regCommands() {
     // Nothing to do
@@ -366,7 +430,7 @@ namespace TypedPortsActive {
     );
 #if FW_PORT_SPAN_TRACING
     Fw::TraceContext _span;
-    Fw::PortTrace::callBegin(*this, "p1", portNum, _span);
+    Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_P1, portNum, _span);
 #endif
     switch (portNum) {
       case 0:
@@ -398,7 +462,7 @@ namespace TypedPortsActive {
         break;
     }
 #if FW_PORT_SPAN_TRACING
-    Fw::PortTrace::callEnd(*this, "p1", portNum, _span);
+    Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_P1, portNum, _span);
 #endif
   }
 
@@ -413,7 +477,7 @@ namespace TypedPortsActive {
     );
 #if FW_PORT_SPAN_TRACING
     Fw::TraceContext _span;
-    Fw::PortTrace::callBegin(*this, "p2", portNum, _span);
+    Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_P2, portNum, _span);
 #endif
     U32 _result = {};
     switch (portNum) {
@@ -434,7 +498,7 @@ namespace TypedPortsActive {
         break;
     }
 #if FW_PORT_SPAN_TRACING
-    Fw::PortTrace::callEnd(*this, "p2", portNum, _span);
+    Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_P2, portNum, _span);
 #endif
     return _result;
   }
@@ -450,7 +514,7 @@ namespace TypedPortsActive {
     );
 #if FW_PORT_SPAN_TRACING
     Fw::TraceContext _span;
-    Fw::PortTrace::callBegin(*this, "p3", portNum, _span);
+    Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_P3, portNum, _span);
 #endif
     F32 _result = {};
     switch (portNum) {
@@ -471,7 +535,7 @@ namespace TypedPortsActive {
         break;
     }
 #if FW_PORT_SPAN_TRACING
-    Fw::PortTrace::callEnd(*this, "p3", portNum, _span);
+    Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_P3, portNum, _span);
 #endif
     return _result;
   }
@@ -487,7 +551,7 @@ namespace TypedPortsActive {
     );
 #if FW_PORT_SPAN_TRACING
     Fw::TraceContext _span;
-    Fw::PortTrace::callBegin(*this, "p4", portNum, _span);
+    Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_P4, portNum, _span);
 #endif
     bool _result = {};
     switch (portNum) {
@@ -508,7 +572,7 @@ namespace TypedPortsActive {
         break;
     }
 #if FW_PORT_SPAN_TRACING
-    Fw::PortTrace::callEnd(*this, "p4", portNum, _span);
+    Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_P4, portNum, _span);
 #endif
     return _result;
   }
@@ -524,7 +588,7 @@ namespace TypedPortsActive {
     );
 #if FW_PORT_SPAN_TRACING
     Fw::TraceContext _span;
-    Fw::PortTrace::callBegin(*this, "p5", portNum, _span);
+    Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_P5, portNum, _span);
 #endif
     Fw::String _result = {};
     switch (portNum) {
@@ -545,7 +609,7 @@ namespace TypedPortsActive {
         break;
     }
 #if FW_PORT_SPAN_TRACING
-    Fw::PortTrace::callEnd(*this, "p5", portNum, _span);
+    Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_P5, portNum, _span);
 #endif
     return _result;
   }
@@ -561,7 +625,7 @@ namespace TypedPortsActive {
     );
 #if FW_PORT_SPAN_TRACING
     Fw::TraceContext _span;
-    Fw::PortTrace::callBegin(*this, "p6", portNum, _span);
+    Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_P6, portNum, _span);
 #endif
     TypedPortsActive::A _result = {};
     switch (portNum) {
@@ -582,7 +646,7 @@ namespace TypedPortsActive {
         break;
     }
 #if FW_PORT_SPAN_TRACING
-    Fw::PortTrace::callEnd(*this, "p6", portNum, _span);
+    Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_P6, portNum, _span);
 #endif
     return _result;
   }
@@ -598,7 +662,7 @@ namespace TypedPortsActive {
     );
 #if FW_PORT_SPAN_TRACING
     Fw::TraceContext _span;
-    Fw::PortTrace::callBegin(*this, "p7", portNum, _span);
+    Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_P7, portNum, _span);
 #endif
     TypedPortsActive::E _result = {};
     switch (portNum) {
@@ -619,7 +683,7 @@ namespace TypedPortsActive {
         break;
     }
 #if FW_PORT_SPAN_TRACING
-    Fw::PortTrace::callEnd(*this, "p7", portNum, _span);
+    Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_P7, portNum, _span);
 #endif
     return _result;
   }
@@ -635,7 +699,7 @@ namespace TypedPortsActive {
     );
 #if FW_PORT_SPAN_TRACING
     Fw::TraceContext _span;
-    Fw::PortTrace::callBegin(*this, "p8", portNum, _span);
+    Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_P8, portNum, _span);
 #endif
     TypedPortsActive::S _result = {};
     switch (portNum) {
@@ -656,7 +720,7 @@ namespace TypedPortsActive {
         break;
     }
 #if FW_PORT_SPAN_TRACING
-    Fw::PortTrace::callEnd(*this, "p8", portNum, _span);
+    Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_P8, portNum, _span);
 #endif
     return _result;
   }

@@ -322,6 +322,21 @@ case class Topology(
       }
     }
 
+  /** Component instances in generated InstanceIds order */
+  lazy val componentInstances: List[ComponentInstance] =
+    componentInstanceMap.keys.toList.sorted
+
+  /** Map from component instances to generated InstanceIds values */
+  lazy val componentInstanceIdMap: Map[ComponentInstance, Int] =
+    componentInstances.zipWithIndex.toMap
+
+  /** Connections in dictionary order, paired with their graph names */
+  lazy val connections: List[(Name.Unqualified, Connection)] =
+    connectionMap.toList.sortBy(_._1).flatMap {
+      case (graphName, graphConnections) =>
+        sortConnections(graphConnections).map(connection => graphName -> connection)
+    }
+
   /** Looks up the location where a component instance appears in this topology.
    *  The instance may appear directly or through a template interface parameter. */
   def lookUpComponentInstanceLoc(ci: ComponentInstance): Option[Location] =

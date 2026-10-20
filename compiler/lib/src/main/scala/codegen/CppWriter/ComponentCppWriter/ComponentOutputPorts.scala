@@ -216,19 +216,20 @@ case class ComponentOutputPorts(
     }
     val invocationLines = if isTypedPort then {
       val portName = p.getUnqualifiedName
+      val portIdName = portTraceIdName(portName)
       val traceInvocation = getInvokerReturnTypeAsString(p) match {
         case "void" => List.concat(
           writeFunctionCall(invocation, Nil, params),
           writeFunctionCall(
             "Fw::PortTrace::callEnd",
-            List("*this", s"\"$portName\"", "portNum", "_span")
+            List("*this", portIdName, "portNum", "_span")
           )
         )
         case returnType => List.concat(
           writeFunctionCall(s"$returnType _result = $invocation", Nil, params),
           writeFunctionCall(
             "Fw::PortTrace::callEnd",
-            List("*this", s"\"$portName\"", "portNum", "_span")
+            List("*this", portIdName, "portNum", "_span")
           ),
           lines("return _result;")
         )
@@ -238,7 +239,7 @@ case class ComponentOutputPorts(
         lines("Fw::TraceContext _span;"),
         writeFunctionCall(
           "Fw::PortTrace::callBegin",
-          List("*this", s"\"$portName\"", "portNum", "_span")
+          List("*this", portIdName, "portNum", "_span")
         ),
         traceInvocation,
         lines("#else"),

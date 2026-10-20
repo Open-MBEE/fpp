@@ -71,6 +71,15 @@ namespace M {
 #endif
 
   }
+#if FW_PORT_SPAN_TRACING
+  FwIndexType getConnectionId(
+    FwEnumStoreType instanceId,
+    FwIndexType portId,
+    FwIndexType portNum
+  ) {
+   return -1;
+  }
+#endif
 
   void regCommands() {
     // Nothing to do

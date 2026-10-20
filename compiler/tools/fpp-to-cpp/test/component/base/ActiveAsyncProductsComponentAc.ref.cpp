@@ -3162,7 +3162,7 @@ void ActiveAsyncProductsComponentBase ::
 
   if (qStatus == Os::Queue::Status::FULL) {
 #if FW_PORT_SPAN_TRACING
-    Fw::PortTrace::dropped(*this, "typedAsyncDropPriority", portNum, _cause);
+    Fw::PortTrace::dropped(*this, PORT_TRACE_ID_TYPEDASYNCDROPPRIORITY, portNum, _cause);
 #endif
     this->incNumMsgDropped();
     return;
@@ -3446,9 +3446,9 @@ void ActiveAsyncProductsComponentBase ::
   );
 #if FW_PORT_SPAN_TRACING
   Fw::TraceContext _span;
-  Fw::PortTrace::callBegin(*this, "noArgsOut", portNum, _span);
+  Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_NOARGSOUT, portNum, _span);
   this->m_noArgsOut_OutputPort[portNum].invoke();
-  Fw::PortTrace::callEnd(*this, "noArgsOut", portNum, _span);
+  Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_NOARGSOUT, portNum, _span);
 #else
   this->m_noArgsOut_OutputPort[portNum].invoke();
 #endif
@@ -3468,9 +3468,9 @@ U32 ActiveAsyncProductsComponentBase ::
   );
 #if FW_PORT_SPAN_TRACING
   Fw::TraceContext _span;
-  Fw::PortTrace::callBegin(*this, "noArgsReturnOut", portNum, _span);
+  Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_NOARGSRETURNOUT, portNum, _span);
   U32 _result = this->m_noArgsReturnOut_OutputPort[portNum].invoke();
-  Fw::PortTrace::callEnd(*this, "noArgsReturnOut", portNum, _span);
+  Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_NOARGSRETURNOUT, portNum, _span);
   return _result;
 #else
   return this->m_noArgsReturnOut_OutputPort[portNum].invoke();
@@ -3491,9 +3491,9 @@ Fw::String ActiveAsyncProductsComponentBase ::
   );
 #if FW_PORT_SPAN_TRACING
   Fw::TraceContext _span;
-  Fw::PortTrace::callBegin(*this, "noArgsStringReturnOut", portNum, _span);
+  Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_NOARGSSTRINGRETURNOUT, portNum, _span);
   Fw::String _result = this->m_noArgsStringReturnOut_OutputPort[portNum].invoke();
-  Fw::PortTrace::callEnd(*this, "noArgsStringReturnOut", portNum, _span);
+  Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_NOARGSSTRINGRETURNOUT, portNum, _span);
   return _result;
 #else
   return this->m_noArgsStringReturnOut_OutputPort[portNum].invoke();
@@ -3523,7 +3523,7 @@ void ActiveAsyncProductsComponentBase ::
   );
 #if FW_PORT_SPAN_TRACING
   Fw::TraceContext _span;
-  Fw::PortTrace::callBegin(*this, "typedAliasOut", portNum, _span);
+  Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_TYPEDALIASOUT, portNum, _span);
   this->m_typedAliasOut_OutputPort[portNum].invoke(
     u32,
     f32,
@@ -3533,7 +3533,7 @@ void ActiveAsyncProductsComponentBase ::
     a,
     s
   );
-  Fw::PortTrace::callEnd(*this, "typedAliasOut", portNum, _span);
+  Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_TYPEDALIASOUT, portNum, _span);
 #else
   this->m_typedAliasOut_OutputPort[portNum].invoke(
     u32,
@@ -3570,7 +3570,7 @@ AliasPrim2 ActiveAsyncProductsComponentBase ::
   );
 #if FW_PORT_SPAN_TRACING
   Fw::TraceContext _span;
-  Fw::PortTrace::callBegin(*this, "typedAliasReturnOut", portNum, _span);
+  Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_TYPEDALIASRETURNOUT, portNum, _span);
   AliasPrim2 _result = this->m_typedAliasReturnOut_OutputPort[portNum].invoke(
     u32,
     f32,
@@ -3580,7 +3580,7 @@ AliasPrim2 ActiveAsyncProductsComponentBase ::
     a,
     s
   );
-  Fw::PortTrace::callEnd(*this, "typedAliasReturnOut", portNum, _span);
+  Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_TYPEDALIASRETURNOUT, portNum, _span);
   return _result;
 #else
   return this->m_typedAliasReturnOut_OutputPort[portNum].invoke(
@@ -3618,7 +3618,7 @@ Fw::String ActiveAsyncProductsComponentBase ::
   );
 #if FW_PORT_SPAN_TRACING
   Fw::TraceContext _span;
-  Fw::PortTrace::callBegin(*this, "typedAliasReturnStringOut", portNum, _span);
+  Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_TYPEDALIASRETURNSTRINGOUT, portNum, _span);
   Fw::String _result = this->m_typedAliasReturnStringOut_OutputPort[portNum].invoke(
     u32,
     f32,
@@ -3628,7 +3628,7 @@ Fw::String ActiveAsyncProductsComponentBase ::
     a,
     s
   );
-  Fw::PortTrace::callEnd(*this, "typedAliasReturnStringOut", portNum, _span);
+  Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_TYPEDALIASRETURNSTRINGOUT, portNum, _span);
   return _result;
 #else
   return this->m_typedAliasReturnStringOut_OutputPort[portNum].invoke(
@@ -3666,7 +3666,7 @@ void ActiveAsyncProductsComponentBase ::
   );
 #if FW_PORT_SPAN_TRACING
   Fw::TraceContext _span;
-  Fw::PortTrace::callBegin(*this, "typedOut", portNum, _span);
+  Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_TYPEDOUT, portNum, _span);
   this->m_typedOut_OutputPort[portNum].invoke(
     u32,
     f32,
@@ -3676,7 +3676,7 @@ void ActiveAsyncProductsComponentBase ::
     a,
     s
   );
-  Fw::PortTrace::callEnd(*this, "typedOut", portNum, _span);
+  Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_TYPEDOUT, portNum, _span);
 #else
   this->m_typedOut_OutputPort[portNum].invoke(
     u32,
@@ -3713,7 +3713,7 @@ F32 ActiveAsyncProductsComponentBase ::
   );
 #if FW_PORT_SPAN_TRACING
   Fw::TraceContext _span;
-  Fw::PortTrace::callBegin(*this, "typedReturnOut", portNum, _span);
+  Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_TYPEDRETURNOUT, portNum, _span);
   F32 _result = this->m_typedReturnOut_OutputPort[portNum].invoke(
     u32,
     f32,
@@ -3723,7 +3723,7 @@ F32 ActiveAsyncProductsComponentBase ::
     a,
     s
   );
-  Fw::PortTrace::callEnd(*this, "typedReturnOut", portNum, _span);
+  Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_TYPEDRETURNOUT, portNum, _span);
   return _result;
 #else
   return this->m_typedReturnOut_OutputPort[portNum].invoke(
@@ -3961,7 +3961,7 @@ Fw::QueuedComponentBase::MsgDispatchStatus ActiveAsyncProductsComponentBase ::
 #if FW_PORT_SPAN_TRACING
       Fw::PortTrace::dispatchBegin(
         *this,
-        "aliasTypedAsync",
+        PORT_TRACE_ID_ALIASTYPEDASYNC,
         portNum,
         _cause,
         _span
@@ -3981,7 +3981,7 @@ Fw::QueuedComponentBase::MsgDispatchStatus ActiveAsyncProductsComponentBase ::
 #if FW_PORT_SPAN_TRACING
       Fw::PortTrace::dispatchEnd(
         *this,
-        "aliasTypedAsync",
+        PORT_TRACE_ID_ALIASTYPEDASYNC,
         portNum,
         _span
       );
@@ -4009,7 +4009,7 @@ Fw::QueuedComponentBase::MsgDispatchStatus ActiveAsyncProductsComponentBase ::
 #if FW_PORT_SPAN_TRACING
       Fw::PortTrace::dispatchBegin(
         *this,
-        "noArgsAsync",
+        PORT_TRACE_ID_NOARGSASYNC,
         portNum,
         _cause,
         _span
@@ -4020,7 +4020,7 @@ Fw::QueuedComponentBase::MsgDispatchStatus ActiveAsyncProductsComponentBase ::
 #if FW_PORT_SPAN_TRACING
       Fw::PortTrace::dispatchEnd(
         *this,
-        "noArgsAsync",
+        PORT_TRACE_ID_NOARGSASYNC,
         portNum,
         _span
       );
@@ -4104,7 +4104,7 @@ Fw::QueuedComponentBase::MsgDispatchStatus ActiveAsyncProductsComponentBase ::
 #if FW_PORT_SPAN_TRACING
       Fw::PortTrace::dispatchBegin(
         *this,
-        "typedAsync",
+        PORT_TRACE_ID_TYPEDASYNC,
         portNum,
         _cause,
         _span
@@ -4124,7 +4124,7 @@ Fw::QueuedComponentBase::MsgDispatchStatus ActiveAsyncProductsComponentBase ::
 #if FW_PORT_SPAN_TRACING
       Fw::PortTrace::dispatchEnd(
         *this,
-        "typedAsync",
+        PORT_TRACE_ID_TYPEDASYNC,
         portNum,
         _span
       );
@@ -4208,7 +4208,7 @@ Fw::QueuedComponentBase::MsgDispatchStatus ActiveAsyncProductsComponentBase ::
 #if FW_PORT_SPAN_TRACING
       Fw::PortTrace::dispatchBegin(
         *this,
-        "typedAsyncAssert",
+        PORT_TRACE_ID_TYPEDASYNCASSERT,
         portNum,
         _cause,
         _span
@@ -4228,7 +4228,7 @@ Fw::QueuedComponentBase::MsgDispatchStatus ActiveAsyncProductsComponentBase ::
 #if FW_PORT_SPAN_TRACING
       Fw::PortTrace::dispatchEnd(
         *this,
-        "typedAsyncAssert",
+        PORT_TRACE_ID_TYPEDASYNCASSERT,
         portNum,
         _span
       );
@@ -4312,7 +4312,7 @@ Fw::QueuedComponentBase::MsgDispatchStatus ActiveAsyncProductsComponentBase ::
 #if FW_PORT_SPAN_TRACING
       Fw::PortTrace::dispatchBegin(
         *this,
-        "typedAsyncBlockPriority",
+        PORT_TRACE_ID_TYPEDASYNCBLOCKPRIORITY,
         portNum,
         _cause,
         _span
@@ -4332,7 +4332,7 @@ Fw::QueuedComponentBase::MsgDispatchStatus ActiveAsyncProductsComponentBase ::
 #if FW_PORT_SPAN_TRACING
       Fw::PortTrace::dispatchEnd(
         *this,
-        "typedAsyncBlockPriority",
+        PORT_TRACE_ID_TYPEDASYNCBLOCKPRIORITY,
         portNum,
         _span
       );
@@ -4416,7 +4416,7 @@ Fw::QueuedComponentBase::MsgDispatchStatus ActiveAsyncProductsComponentBase ::
 #if FW_PORT_SPAN_TRACING
       Fw::PortTrace::dispatchBegin(
         *this,
-        "typedAsyncDropPriority",
+        PORT_TRACE_ID_TYPEDASYNCDROPPRIORITY,
         portNum,
         _cause,
         _span
@@ -4436,7 +4436,7 @@ Fw::QueuedComponentBase::MsgDispatchStatus ActiveAsyncProductsComponentBase ::
 #if FW_PORT_SPAN_TRACING
       Fw::PortTrace::dispatchEnd(
         *this,
-        "typedAsyncDropPriority",
+        PORT_TRACE_ID_TYPEDASYNCDROPPRIORITY,
         portNum,
         _span
       );

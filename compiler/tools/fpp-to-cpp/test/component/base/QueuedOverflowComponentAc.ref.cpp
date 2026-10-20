@@ -1410,7 +1410,7 @@ void QueuedOverflowComponentBase ::
 
   if (qStatus == Os::Queue::Status::FULL) {
 #if FW_PORT_SPAN_TRACING
-    Fw::PortTrace::dropped(*this, "dropAsync", portNum, _cause);
+    Fw::PortTrace::dropped(*this, PORT_TRACE_ID_DROPASYNC, portNum, _cause);
 #endif
     this->incNumMsgDropped();
     return;
@@ -1541,7 +1541,7 @@ void QueuedOverflowComponentBase ::
 
   if (qStatus == Os::Queue::Status::FULL) {
 #if FW_PORT_SPAN_TRACING
-    Fw::PortTrace::dropped(*this, "hookAsync", portNum, _cause);
+    Fw::PortTrace::dropped(*this, PORT_TRACE_ID_HOOKASYNC, portNum, _cause);
 #endif
     this->hookAsync_overflowHook(portNum, u32, f32, b, str1, e, a, s);
     return;
@@ -2128,7 +2128,7 @@ Fw::QueuedComponentBase::MsgDispatchStatus QueuedOverflowComponentBase ::
 #if FW_PORT_SPAN_TRACING
       Fw::PortTrace::dispatchBegin(
         *this,
-        "assertAsync",
+        PORT_TRACE_ID_ASSERTASYNC,
         portNum,
         _cause,
         _span
@@ -2148,7 +2148,7 @@ Fw::QueuedComponentBase::MsgDispatchStatus QueuedOverflowComponentBase ::
 #if FW_PORT_SPAN_TRACING
       Fw::PortTrace::dispatchEnd(
         *this,
-        "assertAsync",
+        PORT_TRACE_ID_ASSERTASYNC,
         portNum,
         _span
       );
@@ -2232,7 +2232,7 @@ Fw::QueuedComponentBase::MsgDispatchStatus QueuedOverflowComponentBase ::
 #if FW_PORT_SPAN_TRACING
       Fw::PortTrace::dispatchBegin(
         *this,
-        "blockAsync",
+        PORT_TRACE_ID_BLOCKASYNC,
         portNum,
         _cause,
         _span
@@ -2252,7 +2252,7 @@ Fw::QueuedComponentBase::MsgDispatchStatus QueuedOverflowComponentBase ::
 #if FW_PORT_SPAN_TRACING
       Fw::PortTrace::dispatchEnd(
         *this,
-        "blockAsync",
+        PORT_TRACE_ID_BLOCKASYNC,
         portNum,
         _span
       );
@@ -2336,7 +2336,7 @@ Fw::QueuedComponentBase::MsgDispatchStatus QueuedOverflowComponentBase ::
 #if FW_PORT_SPAN_TRACING
       Fw::PortTrace::dispatchBegin(
         *this,
-        "dropAsync",
+        PORT_TRACE_ID_DROPASYNC,
         portNum,
         _cause,
         _span
@@ -2356,7 +2356,7 @@ Fw::QueuedComponentBase::MsgDispatchStatus QueuedOverflowComponentBase ::
 #if FW_PORT_SPAN_TRACING
       Fw::PortTrace::dispatchEnd(
         *this,
-        "dropAsync",
+        PORT_TRACE_ID_DROPASYNC,
         portNum,
         _span
       );
@@ -2440,7 +2440,7 @@ Fw::QueuedComponentBase::MsgDispatchStatus QueuedOverflowComponentBase ::
 #if FW_PORT_SPAN_TRACING
       Fw::PortTrace::dispatchBegin(
         *this,
-        "hookAsync",
+        PORT_TRACE_ID_HOOKASYNC,
         portNum,
         _cause,
         _span
@@ -2460,7 +2460,7 @@ Fw::QueuedComponentBase::MsgDispatchStatus QueuedOverflowComponentBase ::
 #if FW_PORT_SPAN_TRACING
       Fw::PortTrace::dispatchEnd(
         *this,
-        "hookAsync",
+        PORT_TRACE_ID_HOOKASYNC,
         portNum,
         _span
       );

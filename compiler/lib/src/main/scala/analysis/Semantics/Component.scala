@@ -47,6 +47,21 @@ case class Component(
   val portMap = portInterface.portMap
   val specialPortMap = portInterface.specialPortMap
 
+  /** Map from typed general port names to span-tracing identifiers */
+  lazy val portTraceIdMap: Map[Name.Unqualified, Int] = {
+    val tracedPorts = portMap.values.toList.flatMap {
+      case port: PortInstance.General =>
+        port.getType.get match {
+          case PortInstance.Type.DefPort(_) => List(port)
+          case PortInstance.Type.Serial => Nil
+        }
+      case _ => Nil
+    }
+    tracedPorts.sortBy(_.getUnqualifiedName).zipWithIndex.map {
+      case (port, id) => port.getUnqualifiedName -> id
+    }.toMap
+  }
+
   /** Query whether the component has parameters */
   def hasParameters = this.paramMap.nonEmpty
 

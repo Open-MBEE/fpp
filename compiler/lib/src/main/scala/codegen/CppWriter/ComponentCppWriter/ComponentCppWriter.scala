@@ -189,6 +189,8 @@ case class ComponentCppWriter (
 
   private def getClassMembers: List[CppDoc.Class.Member] = {
     List.concat(
+      getPortTraceIdEnum,
+
       // Friend classes
       getFriendClassMembers,
 
@@ -240,6 +242,30 @@ case class ComponentCppWriter (
       stateMachineWriter.getVariableMembers,
       getMsgSizeVariableMember,
       getMutexVariableMembers,
+    )
+  }
+
+  private def getPortTraceIdEnum: List[CppDoc.Class.Member] = {
+    val portTraceIds = component.portTraceIdMap.toList.sortBy(_._2)
+    if (portTraceIds.isEmpty) Nil
+    else addAccessTag(
+      "public",
+      List(
+        linesClassMember(
+          lines(
+            s"""|#if FW_PORT_SPAN_TRACING
+                |//! Port span tracing identifiers
+                |enum {
+                |${portTraceIds.map { case (portName, id) =>
+                     s"  ${portTraceIdName(portName)} = $id,"
+                   }.mkString("\n")}
+                |};
+                |#endif
+                |"""
+          ),
+          CppDoc.Lines.Hpp
+        )
+      )
     )
   }
 
@@ -609,6 +635,9 @@ case class ComponentCppWriter (
 
   private def getDispatchFunctionMember: List[CppDoc.Class.Member] = {
     def writeAsyncPortDispatch(p: PortInstance, traceContext: Boolean) = {
+      val tracePortIdName = component.portTraceIdMap.get(p.getUnqualifiedName).map(_ =>
+        portTraceIdName(p.getUnqualifiedName)
+      )
       val traceContextLines = if traceContext then lines(
         """|#if FW_PORT_SPAN_TRACING
            |Fw::TraceContext _cause;
@@ -630,7 +659,7 @@ case class ComponentCppWriter (
         s"""|#if FW_PORT_SPAN_TRACING
             |Fw::PortTrace::dispatchBegin(
             |  *this,
-            |  "${p.getUnqualifiedName}",
+            |  ${tracePortIdName.get},
             |  portNum,
             |  _cause,
             |  _span
@@ -642,7 +671,7 @@ case class ComponentCppWriter (
         s"""|#if FW_PORT_SPAN_TRACING
             |Fw::PortTrace::dispatchEnd(
             |  *this,
-            |  "${p.getUnqualifiedName}",
+            |  ${tracePortIdName.get},
             |  portNum,
             |  _span
             |);

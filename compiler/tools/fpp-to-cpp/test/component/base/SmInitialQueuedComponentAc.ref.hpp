@@ -34,6 +34,14 @@ namespace FppTest {
     public Fw::QueuedComponentBase
   {
 
+    public:
+#if FW_PORT_SPAN_TRACING
+      //! Port span tracing identifiers
+      enum {
+        PORT_TRACE_ID_SCHEDIN = 0,
+      };
+#endif
+
       // ----------------------------------------------------------------------
       // Friend classes
       // ----------------------------------------------------------------------

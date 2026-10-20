@@ -134,23 +134,19 @@ case class TopComponentCppWriter (
     val numPorts = numPortsConstantName(portInstance)
     val returnType = getInvokerReturnTypeAsString(portInstance)
     val nonVoidReturn = returnType != "void"
-    val tracePort = portInstance match {
-      case p: PortInstance.General => p.getType.get match {
-        case PortInstance.Type.DefPort(_) => Some(p.getUnqualifiedName)
-        case PortInstance.Type.Serial => None
-      }
-      case _ => None
-    }
-    val callBegin = tracePort.map(port => lines(
+    val tracePortIdName = component.portTraceIdMap.get(portName).map(_ =>
+      portTraceIdName(portName)
+    )
+    val callBegin = tracePortIdName.map(portIdName => lines(
       s"""|#if FW_PORT_SPAN_TRACING
           |Fw::TraceContext _span;
-          |Fw::PortTrace::callBegin(*this, "$port", portNum, _span);
+          |Fw::PortTrace::callBegin(*this, $portIdName, portNum, _span);
           |#endif
           |"""
     )).getOrElse(Nil)
-    val callEnd = tracePort.map(port => lines(
+    val callEnd = tracePortIdName.map(portIdName => lines(
       s"""|#if FW_PORT_SPAN_TRACING
-          |Fw::PortTrace::callEnd(*this, "$port", portNum, _span);
+          |Fw::PortTrace::callEnd(*this, $portIdName, portNum, _span);
           |#endif
           |"""
     )).getOrElse(Nil)

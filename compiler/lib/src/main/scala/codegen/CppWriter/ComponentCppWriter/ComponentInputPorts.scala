@@ -311,14 +311,14 @@ case class ComponentInputPorts(
       case PortInstance.Type.DefPort(_) => "msg"
       case PortInstance.Type.Serial => "msgSerBuff"
     }
-    val traceContext = p match {
+    val tracePortIdNameOpt = p match {
       case _: PortInstance.General =>
-        p.getType.get match {
-          case PortInstance.Type.DefPort(_) => true
-          case _ => false
-        }
-      case _ => false
+        component.portTraceIdMap.get(p.getUnqualifiedName).map(_ =>
+          portTraceIdName(p.getUnqualifiedName)
+        )
+      case _ => None
     }
+    val traceContext = tracePortIdNameOpt.isDefined
     val traceContextCapture = if traceContext then lines(
       """|#if FW_PORT_SPAN_TRACING
          |Fw::TraceContext _cause;
@@ -413,7 +413,7 @@ case class ComponentInputPorts(
           MessageType.Port,
           p.getUnqualifiedName,
           portNumParam :: getPortFunctionParams(p),
-          if traceContext then Some(p.getUnqualifiedName) else None
+          tracePortIdNameOpt
         )
       )
     )

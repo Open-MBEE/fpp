@@ -86,6 +86,27 @@ namespace M {
 #endif
 
   }
+#if FW_PORT_SPAN_TRACING
+  FwIndexType getConnectionId(
+    FwEnumStoreType instanceId,
+    FwIndexType portId,
+    FwIndexType portNum
+  ) {
+   switch (instanceId) {
+     case InstanceIds::M_dpManager:
+      switch (portId) {
+        case M::DpManagerComponentBase::PORT_TRACE_ID_PRODUCTRESPONSEOUT:
+         switch (portNum) {
+           case 0: return 3;
+           default: return -1;
+         }
+        default: return -1;
+      }
+     default: return -1;
+   }
+   return -1;
+  }
+#endif
 
   void regCommands() {
     // Nothing to do
@@ -493,7 +514,7 @@ namespace M {
     );
 #if FW_PORT_SPAN_TRACING
     Fw::TraceContext _span;
-    Fw::PortTrace::callBegin(*this, "productResponseOut", portNum, _span);
+    Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_PRODUCTRESPONSEOUT, portNum, _span);
 #endif
     switch (portNum) {
       case 0:
@@ -509,7 +530,7 @@ namespace M {
         break;
     }
 #if FW_PORT_SPAN_TRACING
-    Fw::PortTrace::callEnd(*this, "productResponseOut", portNum, _span);
+    Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_PRODUCTRESPONSEOUT, portNum, _span);
 #endif
   }
 

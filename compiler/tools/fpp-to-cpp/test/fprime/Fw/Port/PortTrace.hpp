@@ -15,25 +15,25 @@ struct TraceContext {
 class PortTrace {
   public:
     static void callBegin(const Fw::PassiveComponentBase& caller,
-                          const char* port,
+                          FwIndexType portId,
                           FwIndexType portNum,
                           TraceContext& span);
     static void callEnd(const Fw::PassiveComponentBase& caller,
-                        const char* port,
+                        FwIndexType portId,
                         FwIndexType portNum,
                         const TraceContext& span);
     static void current(TraceContext& ctx);
     static void dispatchBegin(const Fw::PassiveComponentBase& comp,
-                              const char* port,
+                              FwIndexType portId,
                               FwIndexType portNum,
                               const TraceContext& cause,
                               TraceContext& span);
     static void dispatchEnd(const Fw::PassiveComponentBase& comp,
-                            const char* port,
+                            FwIndexType portId,
                             FwIndexType portNum,
                             const TraceContext& span);
     static void dropped(const Fw::PassiveComponentBase& comp,
-                        const char* port,
+                        FwIndexType portId,
                         FwIndexType portNum,
                         const TraceContext& cause);
 };

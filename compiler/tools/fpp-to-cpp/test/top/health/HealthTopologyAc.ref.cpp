@@ -106,6 +106,46 @@ namespace M {
 #endif
 
   }
+#if FW_PORT_SPAN_TRACING
+  FwIndexType getConnectionId(
+    FwEnumStoreType instanceId,
+    FwIndexType portId,
+    FwIndexType portNum
+  ) {
+   switch (instanceId) {
+     case InstanceIds::M_c1:
+      switch (portId) {
+        case M::CComponentBase::PORT_TRACE_ID_PINGOUT:
+         switch (portNum) {
+           case 0: return 0;
+           default: return -1;
+         }
+        default: return -1;
+      }
+     case InstanceIds::M_c2:
+      switch (portId) {
+        case M::CComponentBase::PORT_TRACE_ID_PINGOUT:
+         switch (portNum) {
+           case 0: return 1;
+           default: return -1;
+         }
+        default: return -1;
+      }
+     case InstanceIds::M_health:
+      switch (portId) {
+        case Svc::HealthComponentBase::PORT_TRACE_ID_PINGOUT:
+         switch (portNum) {
+           case 0: return 2;
+           case 1: return 3;
+           default: return -1;
+         }
+        default: return -1;
+      }
+     default: return -1;
+   }
+   return -1;
+  }
+#endif
 
   void regCommands() {
     // Nothing to do
@@ -222,7 +262,7 @@ namespace M {
     );
 #if FW_PORT_SPAN_TRACING
     Fw::TraceContext _span;
-    Fw::PortTrace::callBegin(*this, "pingOut", portNum, _span);
+    Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_PINGOUT, portNum, _span);
 #endif
     const auto instance = this->getInstance();
     switch (instance) {
@@ -261,7 +301,7 @@ namespace M {
         break;
     }
 #if FW_PORT_SPAN_TRACING
-    Fw::PortTrace::callEnd(*this, "pingOut", portNum, _span);
+    Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_PINGOUT, portNum, _span);
 #endif
   }
 
@@ -300,7 +340,7 @@ namespace Svc {
     );
 #if FW_PORT_SPAN_TRACING
     Fw::TraceContext _span;
-    Fw::PortTrace::callBegin(*this, "pingOut", portNum, _span);
+    Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_PINGOUT, portNum, _span);
 #endif
     switch (portNum) {
       case 0:
@@ -320,7 +360,7 @@ namespace Svc {
         break;
     }
 #if FW_PORT_SPAN_TRACING
-    Fw::PortTrace::callEnd(*this, "pingOut", portNum, _span);
+    Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_PINGOUT, portNum, _span);
 #endif
   }
 

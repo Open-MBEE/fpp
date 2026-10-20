@@ -70,7 +70,8 @@ case class TopologyCppWriter(
   private def getTopologyMembers: List[CppDoc.Member] = {
     val hppLines = linesMember(
       TopConstants(s, aNode).getLines ++
-      TopConfigObjects(s, aNode).getHppLines
+      TopConfigObjects(s, aNode).getHppLines ++
+      getConnectionIdDeclaration
     )
     val cppLines = linesMember(
       TopConfigObjects(s, aNode).getCppLines,
@@ -82,6 +83,18 @@ case class TopologyCppWriter(
     val defs = hppLines :: cppLines :: (helperFns ++ setupTeardownFns)
     wrapInNamespaces(namespaceIdentList, defs)
   }
+
+  private def getConnectionIdDeclaration: List[Line] = lines(
+    """|#if FW_PORT_SPAN_TRACING
+       |//! Return the dictionary id of the connection from an output port element, or -1 if none
+       |FwIndexType getConnectionId(
+       |  FwEnumStoreType instanceId, //!< The calling instance (InstanceIds)
+       |  FwIndexType portId,         //!< The port trace id
+       |  FwIndexType portNum         //!< The port number
+       |);
+       |#endif
+       |"""
+  )
 
   private def getComponentMembers: List[CppDoc.Member] =
     topComponents.getMembers

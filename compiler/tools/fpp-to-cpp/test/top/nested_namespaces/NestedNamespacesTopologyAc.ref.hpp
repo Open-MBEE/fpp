@@ -34,6 +34,14 @@ namespace M {
       c,
     };
   }
+#if FW_PORT_SPAN_TRACING
+  //! Return the dictionary id of the connection from an output port element, or -1 if none
+  FwIndexType getConnectionId(
+    FwEnumStoreType instanceId, //!< The calling instance (InstanceIds)
+    FwIndexType portId,         //!< The port trace id
+    FwIndexType portNum         //!< The port number
+  );
+#endif
 
   // ----------------------------------------------------------------------
   // Helper functions

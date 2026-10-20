@@ -51,6 +51,34 @@ class PassiveGetProductsComponentBase :
   public Fw::PassiveComponentBase
 {
 
+  public:
+#if FW_PORT_SPAN_TRACING
+    //! Port span tracing identifiers
+    enum {
+      PORT_TRACE_ID_NOARGSALIASSTRINGRETURNSYNC = 0,
+      PORT_TRACE_ID_NOARGSGUARDED = 1,
+      PORT_TRACE_ID_NOARGSOUT = 2,
+      PORT_TRACE_ID_NOARGSRETURNGUARDED = 3,
+      PORT_TRACE_ID_NOARGSRETURNOUT = 4,
+      PORT_TRACE_ID_NOARGSRETURNSYNC = 5,
+      PORT_TRACE_ID_NOARGSSTRINGRETURNOUT = 6,
+      PORT_TRACE_ID_NOARGSSTRINGRETURNSYNC = 7,
+      PORT_TRACE_ID_NOARGSSYNC = 8,
+      PORT_TRACE_ID_TYPEDALIASGUARDED = 9,
+      PORT_TRACE_ID_TYPEDALIASOUT = 10,
+      PORT_TRACE_ID_TYPEDALIASRETURNOUT = 11,
+      PORT_TRACE_ID_TYPEDALIASRETURNSTRINGOUT = 12,
+      PORT_TRACE_ID_TYPEDALIASRETURNSYNC = 13,
+      PORT_TRACE_ID_TYPEDALIASSTRINGRETURNSYNC = 14,
+      PORT_TRACE_ID_TYPEDGUARDED = 15,
+      PORT_TRACE_ID_TYPEDOUT = 16,
+      PORT_TRACE_ID_TYPEDRETURNGUARDED = 17,
+      PORT_TRACE_ID_TYPEDRETURNOUT = 18,
+      PORT_TRACE_ID_TYPEDRETURNSYNC = 19,
+      PORT_TRACE_ID_TYPEDSYNC = 20,
+    };
+#endif
+
     // ----------------------------------------------------------------------
     // Friend classes
     // ----------------------------------------------------------------------

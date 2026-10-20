@@ -2270,9 +2270,9 @@ void PassiveParamsComponentBase ::
   );
 #if FW_PORT_SPAN_TRACING
   Fw::TraceContext _span;
-  Fw::PortTrace::callBegin(*this, "noArgsOut", portNum, _span);
+  Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_NOARGSOUT, portNum, _span);
   this->m_noArgsOut_OutputPort[portNum].invoke();
-  Fw::PortTrace::callEnd(*this, "noArgsOut", portNum, _span);
+  Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_NOARGSOUT, portNum, _span);
 #else
   this->m_noArgsOut_OutputPort[portNum].invoke();
 #endif
@@ -2292,9 +2292,9 @@ U32 PassiveParamsComponentBase ::
   );
 #if FW_PORT_SPAN_TRACING
   Fw::TraceContext _span;
-  Fw::PortTrace::callBegin(*this, "noArgsReturnOut", portNum, _span);
+  Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_NOARGSRETURNOUT, portNum, _span);
   U32 _result = this->m_noArgsReturnOut_OutputPort[portNum].invoke();
-  Fw::PortTrace::callEnd(*this, "noArgsReturnOut", portNum, _span);
+  Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_NOARGSRETURNOUT, portNum, _span);
   return _result;
 #else
   return this->m_noArgsReturnOut_OutputPort[portNum].invoke();
@@ -2315,9 +2315,9 @@ Fw::String PassiveParamsComponentBase ::
   );
 #if FW_PORT_SPAN_TRACING
   Fw::TraceContext _span;
-  Fw::PortTrace::callBegin(*this, "noArgsStringReturnOut", portNum, _span);
+  Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_NOARGSSTRINGRETURNOUT, portNum, _span);
   Fw::String _result = this->m_noArgsStringReturnOut_OutputPort[portNum].invoke();
-  Fw::PortTrace::callEnd(*this, "noArgsStringReturnOut", portNum, _span);
+  Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_NOARGSSTRINGRETURNOUT, portNum, _span);
   return _result;
 #else
   return this->m_noArgsStringReturnOut_OutputPort[portNum].invoke();
@@ -2347,7 +2347,7 @@ void PassiveParamsComponentBase ::
   );
 #if FW_PORT_SPAN_TRACING
   Fw::TraceContext _span;
-  Fw::PortTrace::callBegin(*this, "typedAliasOut", portNum, _span);
+  Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_TYPEDALIASOUT, portNum, _span);
   this->m_typedAliasOut_OutputPort[portNum].invoke(
     u32,
     f32,
@@ -2357,7 +2357,7 @@ void PassiveParamsComponentBase ::
     a,
     s
   );
-  Fw::PortTrace::callEnd(*this, "typedAliasOut", portNum, _span);
+  Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_TYPEDALIASOUT, portNum, _span);
 #else
   this->m_typedAliasOut_OutputPort[portNum].invoke(
     u32,
@@ -2394,7 +2394,7 @@ AliasPrim2 PassiveParamsComponentBase ::
   );
 #if FW_PORT_SPAN_TRACING
   Fw::TraceContext _span;
-  Fw::PortTrace::callBegin(*this, "typedAliasReturnOut", portNum, _span);
+  Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_TYPEDALIASRETURNOUT, portNum, _span);
   AliasPrim2 _result = this->m_typedAliasReturnOut_OutputPort[portNum].invoke(
     u32,
     f32,
@@ -2404,7 +2404,7 @@ AliasPrim2 PassiveParamsComponentBase ::
     a,
     s
   );
-  Fw::PortTrace::callEnd(*this, "typedAliasReturnOut", portNum, _span);
+  Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_TYPEDALIASRETURNOUT, portNum, _span);
   return _result;
 #else
   return this->m_typedAliasReturnOut_OutputPort[portNum].invoke(
@@ -2442,7 +2442,7 @@ Fw::String PassiveParamsComponentBase ::
   );
 #if FW_PORT_SPAN_TRACING
   Fw::TraceContext _span;
-  Fw::PortTrace::callBegin(*this, "typedAliasReturnStringOut", portNum, _span);
+  Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_TYPEDALIASRETURNSTRINGOUT, portNum, _span);
   Fw::String _result = this->m_typedAliasReturnStringOut_OutputPort[portNum].invoke(
     u32,
     f32,
@@ -2452,7 +2452,7 @@ Fw::String PassiveParamsComponentBase ::
     a,
     s
   );
-  Fw::PortTrace::callEnd(*this, "typedAliasReturnStringOut", portNum, _span);
+  Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_TYPEDALIASRETURNSTRINGOUT, portNum, _span);
   return _result;
 #else
   return this->m_typedAliasReturnStringOut_OutputPort[portNum].invoke(
@@ -2490,7 +2490,7 @@ void PassiveParamsComponentBase ::
   );
 #if FW_PORT_SPAN_TRACING
   Fw::TraceContext _span;
-  Fw::PortTrace::callBegin(*this, "typedOut", portNum, _span);
+  Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_TYPEDOUT, portNum, _span);
   this->m_typedOut_OutputPort[portNum].invoke(
     u32,
     f32,
@@ -2500,7 +2500,7 @@ void PassiveParamsComponentBase ::
     a,
     s
   );
-  Fw::PortTrace::callEnd(*this, "typedOut", portNum, _span);
+  Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_TYPEDOUT, portNum, _span);
 #else
   this->m_typedOut_OutputPort[portNum].invoke(
     u32,
@@ -2537,7 +2537,7 @@ F32 PassiveParamsComponentBase ::
   );
 #if FW_PORT_SPAN_TRACING
   Fw::TraceContext _span;
-  Fw::PortTrace::callBegin(*this, "typedReturnOut", portNum, _span);
+  Fw::PortTrace::callBegin(*this, PORT_TRACE_ID_TYPEDRETURNOUT, portNum, _span);
   F32 _result = this->m_typedReturnOut_OutputPort[portNum].invoke(
     u32,
     f32,
@@ -2547,7 +2547,7 @@ F32 PassiveParamsComponentBase ::
     a,
     s
   );
-  Fw::PortTrace::callEnd(*this, "typedReturnOut", portNum, _span);
+  Fw::PortTrace::callEnd(*this, PORT_TRACE_ID_TYPEDRETURNOUT, portNum, _span);
   return _result;
 #else
   return this->m_typedReturnOut_OutputPort[portNum].invoke(
