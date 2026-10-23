@@ -130,6 +130,12 @@ case class ComponentCommands (
           s"""|// Call pre-message hook
               |this->$hookName(opCode,cmdSeq);
               |
+              |#if FW_PORT_SPAN_TRACING
+              |// Capture the causal context of the enqueueing call
+              |Fw::TraceContext _cause;
+              |Fw::PortTrace::current(_cause);
+              |#endif
+              |
               |// Defer deserializing arguments to the message dispatcher
               |// to avoid deserializing and reserializing just for IPC
               |ComponentIpcSerializableBuffer msg;
@@ -157,6 +163,20 @@ case class ComponentCommands (
                   |"""
             )
           )
+        ),
+        lines(
+          """|#if FW_PORT_SPAN_TRACING
+             |_status = msg.serializeFrom(
+             |  reinterpret_cast<const U8*>(&_cause),
+             |  static_cast<FwSizeType>(sizeof(_cause)),
+             |  Fw::Serialization::OMIT_LENGTH
+             |);
+             |FW_ASSERT (
+             |  _status == Fw::FW_SERIALIZE_OK,
+             |  static_cast<FwAssertArgType>(_status)
+             |);
+             |#endif
+             |"""
         ),
         writeSendMessageLogic(
           "msg",

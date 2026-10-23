@@ -55,6 +55,8 @@ case class Component(
           case PortInstance.Type.DefPort(_) => List(port)
           case PortInstance.Type.Serial => Nil
         }
+      case port: PortInstance.Special
+        if port.specifier.kind == Ast.SpecPortInstance.CommandRecv => List(port)
       case _ => Nil
     }
     tracedPorts.sortBy(_.getUnqualifiedName).zipWithIndex.map {

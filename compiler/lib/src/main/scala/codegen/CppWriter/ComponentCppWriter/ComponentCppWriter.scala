@@ -100,7 +100,7 @@ case class ComponentCppWriter (
     val internalStrHeaders =
       guardedList (hasInternalPorts) (List("Fw/Types/InternalInterfaceString.hpp"))
     val traceHeaders =
-      guardedList (typedOutputPorts.nonEmpty || typedAsyncInputPorts.nonEmpty) (
+      guardedList (typedOutputPorts.nonEmpty || typedAsyncInputPorts.nonEmpty || asyncCmds.nonEmpty) (
         List("Fw/Port/PortTrace.hpp")
       )
     val systemHeaders =
@@ -429,7 +429,7 @@ case class ComponentCppWriter (
 
   private def getComponentIpcSerializableBufferClass(buffUnion: List[Line]): List[Line] = {
     val maxDataSize = if buffUnion.nonEmpty then "sizeof(BuffUnion)" else "0"
-    val serializationSize = if typedAsyncInputPorts.nonEmpty then
+    val serializationSize = if typedAsyncInputPorts.nonEmpty || asyncCmds.nonEmpty then
       """|#if FW_PORT_SPAN_TRACING
          |      SERIALIZATION_SIZE = DATA_OFFSET + MAX_DATA_SIZE + sizeof(Fw::TraceContext)
          |#else
@@ -737,6 +737,7 @@ case class ComponentCppWriter (
       val cmdRespName = cmdRespPort.get.getUnqualifiedName
       val cmdRespVarName = portVariableName(cmdRespPort.get)
       val cmdRespIsConnectedName = outputPortIsConnectedName(cmdRespName)
+      val cmdTraceIdName = portTraceIdName(cmdRecvPort.get.getUnqualifiedName)
       val body = intersperseBlankLines(
         List(
           lines(
@@ -763,6 +764,22 @@ case class ComponentCppWriter (
                |  _deserStatus == Fw::FW_SERIALIZE_OK,
                |  static_cast<FwAssertArgType>(_deserStatus)
                |);
+               |
+               |#if FW_PORT_SPAN_TRACING
+               |// Deserialize the causal context captured at enqueue
+               |Fw::TraceContext _cause;
+               |FwSizeType _causeSize = static_cast<FwSizeType>(sizeof(_cause));
+               |_deserStatus = _msg.deserializeTo(
+               |  reinterpret_cast<U8*>(&_cause),
+               |  _causeSize,
+               |  Fw::Serialization::OMIT_LENGTH
+               |);
+               |FW_ASSERT (
+               |  _deserStatus == Fw::FW_SERIALIZE_OK,
+               |  static_cast<FwAssertArgType>(_deserStatus)
+               |);
+               |Fw::TraceContext _span;
+               |#endif
                |
                |// Reset buffer
                |args.resetDeser();
@@ -803,12 +820,35 @@ case class ComponentCppWriter (
                 |#endif
                 |"""
           ),
+          lines(
+            s"""|#if FW_PORT_SPAN_TRACING
+                |Fw::PortTrace::dispatchBegin(
+                |  *this,
+                |  $cmdTraceIdName,
+                |  0,
+                |  _cause,
+                |  _span
+                |);
+                |#endif
+                |"""
+          ),
           line("// Call handler function") ::
             writeFunctionCall(
               s"this->${commandHandlerName(cmd.getName)}",
               List("_opCode, _cmdSeq"),
               cmdParamTypeMap(opcode).map(_._1)
             ),
+          lines(
+            s"""|#if FW_PORT_SPAN_TRACING
+                |Fw::PortTrace::dispatchEnd(
+                |  *this,
+                |  $cmdTraceIdName,
+                |  0,
+                |  _span
+                |);
+                |#endif
+                |"""
+          ),
           lines("break;")
         )
       )
