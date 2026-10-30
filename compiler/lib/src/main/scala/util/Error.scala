@@ -44,6 +44,7 @@ sealed trait Error {
         System.err.println(prevLoc)
       case CodeGenError.EmptyStruct(loc) =>
         Error.print (Some(loc)) (s"cannot write XML for an empty struct")
+      case CodeGenError.ShellError(msg) => Error.print (None) (msg)
       case IncludeError.Cycle(loc, msg) => Error.print (Some(loc)) (msg)
       case FileError.CannotOpen(locOpt, name) =>
         Error.print (locOpt) (s"cannot open file $name")
@@ -455,6 +456,8 @@ object CodeGenError {
   final case class DuplicateXmlFile(file: String, loc: Location, prevLoc: Location) extends Error
   /** Empty struct */
   final case class EmptyStruct(loc: Location) extends Error
+  /** A topology the shell generators (fpp-to-lean, fpp-to-sysml) cannot write */
+  final case class ShellError(msg: String) extends Error
 }
 
 /** An include error */
