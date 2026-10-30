@@ -1,0 +1,2 @@
+fpp-to-lean
+error: topology Demo.Exposed exposes ports (dataIn): topology ports are not supported by the shell generators

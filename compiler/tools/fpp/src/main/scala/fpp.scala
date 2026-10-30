@@ -23,6 +23,8 @@ object FPP {
       case "to-fpp"      => FPPToFPP.toolMain(options.args)
       case "to-json"     => FPPtoJson.toolMain(options.args)
       case "to-layout"   => FPPToLayout.toolMain(options.args)
+      case "to-lean"     => FPPToLean.toolMain(options.args)
+      case "to-sysml"    => FPPToSysml.toolMain(options.args)
     }
 
     Right(None)
@@ -68,6 +70,8 @@ to-dict     writes JSON dictionaries corresponding to F Prime topologies
 to-fpp      parses FPP source files optionally expands source and writes out FPP source files
 to-json     parses an FPP model, performs semantic checking on it, and writes out the model in JSON
 to-layout   writes layout text files for connection graphs within F Prime topologies
+to-lean     writes the shell of a topology (ports, components, contract, instances, connections) as Lean 4
+to-sysml    writes the shell of a topology as SysML v2 structure
 """),
       help('h', "help").text("print this message and exit"),
       version('v', "version").text("print version and exit"),
@@ -78,7 +82,8 @@ to-layout   writes layout text files for connection graphs within F Prime topolo
           c match {
             case "check" | "depend" | "filenames" | "from-xml" |
                  "locate-defs" | "locate-uses" | "syntax" | "to-cpp" |
-                 "to-dict" | "to-fpp" | "to-json" | "to-layout" =>
+                 "to-dict" | "to-fpp" | "to-json" | "to-layout" | "to-lean" |
+                 "to-sysml" =>
               Right(())
             case _ => Left(s"invalid fpp command '$c'")
           }

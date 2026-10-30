@@ -1375,6 +1375,114 @@ a complete or semantically correct FPP model to the tool.
 will write JSON with no spaces or newlines. With this option, nested JSON
 objects will be indented.
 
+=== Generating Lean and SysML v2 Shells
+
+FPP provides two tools, `fpp-to-lean` and `fpp-to-sysml`, that write
+the *shell* of a topology: what every implementation of one of its
+components must agree on, whichever language the implementation is
+written in.
+The shell is the part of the model that FPP fixes and that `fpp-to-cpp`
+turns into the autocoded base classes:
+
+* the port types, with their parameters (by value or by reference) and
+return types;
+* the components, with their kind (passive, queued, active), their port
+instances (kind, queue-full policy, array size, special role), and their
+external contract -- commands (opcodes, kinds, parameters), events (ids,
+severities, formats, throttles), telemetry channels (ids, types, update
+policies, formats) and parameters (ids, types, defaults, set and save
+opcodes), with ids relative to the instance's base id;
+* the component instances of the topology, with their base ids, queue
+sizes and priorities;
+* the connections, with their port numbers, grouped by connection group
+(the connections of a pattern such as `command connections` are in a
+group named after the pattern).
+
+Behavior is not in FPP, so it is not in the shell: handler bodies stay
+with each implementation.
+`fpp-to-lean` writes the shell as a self-contained Lean 4 module
+(inductive types for the port types, components and instances; structures
+and lists for the rest), so that a Lean model or proof can state facts
+about the topology by `decide`.
+`fpp-to-sysml` writes it as a SysML v2 package in the standard textual
+notation: a `port def` per port type, a `part def` per component with
+one `port` per port instance (output ports conjugated, a port array of
+size _n_ written as _n_ ports `name_0` ... `name_{n-1}`) and its contract
+as items, and a `part def` for the topology with its parts and `connect`
+statements.
+FPP types other than the primitive ones are opaque in both outputs (their
+layout is FPP's); in SysML they are `attribute def` entries of a nested
+`Types` package, so that a port type and an FPP type may share a name.
+
+*Procedure:*
+The procedure is the one described for `fpp-to-dict`
+<<Analyzing-and-Translating-Models_Generating-Ground-Dictionaries,above>>:
+
+. Identify the files _F_ that define the topology (its instances and
+its topology definition) and compute their dependencies _D_ with
+`fpp-depend`.
+. Run `fpp-to-lean -i` _D_ _F_ or `fpp-to-sysml -i` _D_ _F_.
+
+The files _F_ must define exactly one topology; the tools report an error
+otherwise.
+Only the components the topology instantiates are written (an unrelated
+component with a serial port does not stop the shell); a topology that
+exposes ports (`port p = instance.port`) is refused, as is one whose
+components use serial ports.
+Definitions are listed dependencies first: the imports, then the input
+files; an explicit connection group keeps its source order, a pattern's
+connections are sorted by endpoint.
+Qualified names are flattened with `_` (`Demo.Worker` is `Demo_Worker`);
+two names that flatten to the same identifier (`A_B.C` and `A.B_C`) are
+refused.
+An instance is written by its base name, or by its flattened qualified
+name when two instances of the topology share a base name (`A.worker`
+and `B.worker` are `A_worker` and `B_worker`; the qualified name is kept
+as `Instance.qualifiedName` in Lean and in a comment in SysML).
+A parameter default or a string size that is a constant expression is
+written as its evaluated value.
+A name that is a reserved word of the target language (`end`, for example)
+is escaped (`«end»` in Lean, `'end'` in SysML).
+
+*Options:*
+
+* `-o` _file_ writes the output to _file_ instead of standard output.
+* `-n` _namespace_ (`fpp-to-lean`) names the Lean namespace of the
+generated module (default `FppGen`); `-p` _package_ (`fpp-to-sysml`)
+names the SysML package (default `FppGen`).
+* `-s` _text_ names the source in the generated header (default: the
+input files), for a header that does not depend on where the model was
+checked out.
+
+*Example:*
+For the topology `Demo.Basic` of the tool tests, with two instances `worker` and `sink`
+of components `Worker` and `Sink`, `fpp-to-sysml` writes, among other things:
+
+[source,sysml]
+----
+    part def Demo_Worker {  // active component Demo.Worker
+        port cmdIn : Fw_Cmd;  // command recv port, async input, queue full: assert
+        port dataIn_0 : Demo_Data;  // async input, priority 3, queue full: drop
+        port dataIn_1 : Demo_Data;  // async input, priority 3, queue full: drop
+        port dataOut_0 : ~Demo_Data;  // output
+        ...
+        item cmd_START : Contract::Command {  // async, queue full drop
+            attribute :>> opcode = 16;
+            attribute count : Integer;
+            attribute name : Contract::SizedString { attribute :>> size = 8; }
+        }
+        ...
+    }
+
+    part def Demo_Basic {
+        part worker : Demo_Worker;  // Demo.worker, base id 256, queue size 10
+        part sink : Demo_Sink;  // Demo.sink, base id 512
+        ...
+        connect worker.dataOut_0 to sink.dataIn;  // Data
+        ...
+    }
+----
+
 === Translating Older XML to FPP
 
 Previous versions of F Prime used XML to represent model
