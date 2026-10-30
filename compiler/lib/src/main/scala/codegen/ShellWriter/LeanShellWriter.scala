@@ -38,7 +38,7 @@ object LeanShellWriter {
   }
 
   def portKind(k: PortKind): String = k match {
-    case PortKind.AsyncInput(q) => s".asyncInput ${queueFull(q)}"
+    case PortKind.AsyncInput(p, q) => s".asyncInput ${p.map(n => s"(some $n)").getOrElse("none")} ${queueFull(q)}"
     case PortKind.SyncInput => ".syncInput"
     case PortKind.GuardedInput => ".guardedInput"
     case PortKind.Output => ".output"
@@ -75,7 +75,6 @@ object LeanShellWriter {
     val ports = m.usedPorts
     val comps = m.usedComponents
     if m.instances.isEmpty then return error("the topology has no component instances")
-    if ports.isEmpty then return error("the topology's components have no ports")
     def portCtor(id: AstNode.Id): Result.Result[String] = m.port(id) match {
       case Some(p) => Right(ctor(p.qname))
       case None => error(s"port type $id is used but not defined")
@@ -88,8 +87,9 @@ object LeanShellWriter {
       case Some(i) => Right(ident(i.name))
       case None => error(s"instance $id is connected but not in the topology")
     }
+    // A topology of portless components has an empty `PortType`: its functions have no arm to write.
     def portArms(f: PortDef => String): String =
-      ports.map(p => arm(ctor(p.qname), f(p))).mkString("\n")
+      if ports.isEmpty then "  | x => nomatch x" else ports.map(p => arm(ctor(p.qname), f(p))).mkString("\n")
     def compArms(f: ComponentDef => Result.Result[String]): Result.Result[String] =
       Result.map(comps, (c: ComponentDef) => f(c).map(rhs => arm(ctor(c.qname), rhs))).map(_.mkString("\n"))
     def instArms(f: InstanceDef => Result.Result[String]): Result.Result[String] =
@@ -120,6 +120,7 @@ object LeanShellWriter {
       compTelemetry <- compArms(c => Right(list(c.telemetry.map(tlmLine))))
       compParameters <- compArms(c => Right(list(c.parameters.map(paramLine))))
       instName <- instArms(i => Right(strLit(i.name)))
+      instQualifiedName <- instArms(i => Right(strLit(i.qname.mkString("."))))
       instComponent <- instArms(i => compCtor(i.component).map(c => s".$c"))
       instBaseId <- instArms(i => Right(i.baseId.toString))
       instQueueSize <- instArms(i => Right(optNat(i.queueSize)))
@@ -150,9 +151,9 @@ inductive QueueFull
   | hook
   deriving DecidableEq, Repr
 
-/-- `async`/`sync`/`guarded input` or `output`. -/
+/-- `async`/`sync`/`guarded input` or `output`; an async input carries its `priority` if the FPP gives one. -/
 inductive PortKind
-  | asyncInput (queueFull : QueueFull)
+  | asyncInput (priority : Option Nat) (queueFull : QueueFull)
   | syncInput
   | guardedInput
   | output
@@ -285,8 +286,14 @@ ${m.instances.map(i => s"  | ${ident(i.name)}").mkString("\n")}
 def Instance.all : List Instance :=
 ${list(m.instances.map(i => s".${ident(i.name)}"), "  ")}
 
+/-- The instance's name in the shells: the FPP base name, or the qualified name flattened when two
+instances of the topology share a base name. -/
 def Instance.name : Instance → String
 $instName
+
+/-- The instance's qualified FPP name. -/
+def Instance.qualifiedName : Instance → String
+$instQualifiedName
 
 def Instance.component : Instance → Component
 $instComponent

@@ -1425,8 +1425,22 @@ its topology definition) and compute their dependencies _D_ with
 
 The files _F_ must define exactly one topology; the tools report an error
 otherwise.
+Only the components the topology instantiates are written (an unrelated
+component with a serial port does not stop the shell); a topology that
+exposes ports (`port p = instance.port`) is refused, as is one whose
+components use serial ports.
 Definitions are listed dependencies first: the imports, then the input
-files.
+files; an explicit connection group keeps its source order, a pattern's
+connections are sorted by endpoint.
+Qualified names are flattened with `_` (`Demo.Worker` is `Demo_Worker`);
+two names that flatten to the same identifier (`A_B.C` and `A.B_C`) are
+refused.
+An instance is written by its base name, or by its flattened qualified
+name when two instances of the topology share a base name (`A.worker`
+and `B.worker` are `A_worker` and `B_worker`; the qualified name is kept
+as `Instance.qualifiedName` in Lean and in a comment in SysML).
+A parameter default or a string size that is a constant expression is
+written as its evaluated value.
 A name that is a reserved word of the target language (`end`, for example)
 is escaped (`«end»` in Lean, `'end'` in SysML).
 
@@ -1448,21 +1462,21 @@ of components `Worker` and `Sink`, `fpp-to-sysml` writes, among other things:
 ----
     part def Demo_Worker {  // active component Demo.Worker
         port cmdIn : Fw_Cmd;  // command recv port, async input, queue full: assert
-        port dataIn_0 : Demo_Data;  // async input, queue full: drop
-        port dataIn_1 : Demo_Data;  // async input, queue full: drop
+        port dataIn_0 : Demo_Data;  // async input, priority 3, queue full: drop
+        port dataIn_1 : Demo_Data;  // async input, priority 3, queue full: drop
         port dataOut_0 : ~Demo_Data;  // output
         ...
         item cmd_START : Contract::Command {  // async, queue full drop
             attribute :>> opcode = 16;
             attribute count : Integer;
-            attribute name : String;
+            attribute name : Contract::SizedString { attribute :>> size = 8; }
         }
         ...
     }
 
     part def Demo_Basic {
-        part worker : Demo_Worker;  // base id 256, queue size 10
-        part sink : Demo_Sink;  // base id 512
+        part worker : Demo_Worker;  // Demo.worker, base id 256, queue size 10
+        part sink : Demo_Sink;  // Demo.sink, base id 512
         ...
         connect worker.dataOut_0 to sink.dataIn;  // Data
         ...

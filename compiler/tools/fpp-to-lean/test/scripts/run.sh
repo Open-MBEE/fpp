@@ -7,7 +7,7 @@ fpp_to_lean=$COMPILER_ROOT/bin/fpp-to-lean
 # The generated header and the Lean module name the fpp version; the reference output must not
 remove_version()
 {
-  sed -e 's/(fpp [^)]*)/(fpp [version])/' -e 's/^def fppVersion := .*/def fppVersion := "[version]"/'
+  sed -e 's/(fpp [^)]*)/(fpp [version])/' -e 's/^def fppVersion : String := .*/def fppVersion : String := "[version]"/'
 }
 
 compare()

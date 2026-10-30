@@ -1,0 +1,2 @@
+fpp-to-lean
+error: the input files define several topologies (Demo.First, Demo.Second); pass the one to generate as an input file and the others with -i

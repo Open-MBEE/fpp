@@ -6,7 +6,7 @@ fpp_to_lean=$COMPILER_ROOT/bin/fpp-to-lean
 
 remove_version()
 {
-  sed -e 's/(fpp [^)]*)/(fpp [version])/' -e 's/^def fppVersion := .*/def fppVersion := "[version]"/'
+  sed -e 's/(fpp [^)]*)/(fpp [version])/' -e 's/^def fppVersion : String := .*/def fppVersion : String := "[version]"/'
 }
 
 update()

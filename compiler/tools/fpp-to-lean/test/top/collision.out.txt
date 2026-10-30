@@ -1,0 +1,2 @@
+fpp-to-lean
+error: port types Demo.A_B.C and Demo.A.B_C would all be written Demo_A_B_C in the shells

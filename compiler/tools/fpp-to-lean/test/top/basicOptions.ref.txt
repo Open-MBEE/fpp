@@ -11,7 +11,7 @@ instance's base id), instances, connections. Behaviour is not in FPP and not her
 
 namespace Demo.Gen
 
-def fppVersion : String := "7fd81190c"
+def fppVersion : String := "[version]"
 
 def topology : String := "Demo.Basic"
 
@@ -23,9 +23,9 @@ inductive QueueFull
   | hook
   deriving DecidableEq, Repr
 
-/-- `async`/`sync`/`guarded input` or `output`. -/
+/-- `async`/`sync`/`guarded input` or `output`; an async input carries its `priority` if the FPP gives one. -/
 inductive PortKind
-  | asyncInput (queueFull : QueueFull)
+  | asyncInput (priority : Option Nat) (queueFull : QueueFull)
   | syncInput
   | guardedInput
   | output
@@ -159,10 +159,10 @@ structure Port where
 
 def Component.ports : Component → List Port
   | .Demo_Worker => [
-    { name := "cmdIn", kind := .asyncInput .assert, ty := .Fw_Cmd, size := 1, special := some "command recv" },
+    { name := "cmdIn", kind := .asyncInput none .assert, ty := .Fw_Cmd, size := 1, special := some "command recv" },
     { name := "cmdRegOut", kind := .output, ty := .Fw_CmdReg, size := 1, special := some "command reg" },
     { name := "cmdResponseOut", kind := .output, ty := .Fw_CmdResponse, size := 1, special := some "command resp" },
-    { name := "dataIn", kind := .asyncInput .drop, ty := .Demo_Data, size := 2, special := none },
+    { name := "dataIn", kind := .asyncInput (some 3) .drop, ty := .Demo_Data, size := 2, special := none },
     { name := "dataOut", kind := .output, ty := .Demo_Data, size := 2, special := none },
     { name := "eventOut", kind := .output, ty := .Fw_Log, size := 1, special := some "event" },
     { name := "guardedIn", kind := .guardedInput, ty := .Demo_Query, size := 1, special := none },
@@ -239,10 +239,13 @@ def Component.commands : Component → List Command
     { name := "STOP", opcode := 17, kind := .sync, params := [] },
     { name := "RESET", opcode := 18, kind := .guarded, params := [
       { name := "hard", ty := "bool", ref := false } ] },
+    { name := "end", opcode := 19, kind := .sync, params := [] },
     { name := "RATE_PRM_SET", opcode := 32, kind := .paramSet, params := [] },
     { name := "RATE_PRM_SAVE", opcode := 33, kind := .paramSave, params := [] },
     { name := "ENABLED_PRM_SET", opcode := 34, kind := .paramSet, params := [] },
-    { name := "ENABLED_PRM_SAVE", opcode := 35, kind := .paramSave, params := [] } ]
+    { name := "ENABLED_PRM_SAVE", opcode := 35, kind := .paramSave, params := [] },
+    { name := "BURST_PRM_SET", opcode := 36, kind := .paramSet, params := [] },
+    { name := "BURST_PRM_SAVE", opcode := 37, kind := .paramSave, params := [] } ]
   | .Demo_Sink => []
   | .Demo_Dispatcher => []
   | .Demo_Clock => []
@@ -267,7 +270,8 @@ def Component.telemetry : Component → List TlmChannel
 def Component.parameters : Component → List Parameter
   | .Demo_Worker => [
     { name := "Rate", id := 1, ty := "F64", default := some "1.5", setOpcode := 32, saveOpcode := 33 },
-    { name := "Enabled", id := 2, ty := "bool", default := some "true", setOpcode := 34, saveOpcode := 35 } ]
+    { name := "Enabled", id := 2, ty := "bool", default := some "true", setOpcode := 34, saveOpcode := 35 },
+    { name := "Burst", id := 3, ty := "U32", default := some "4", setOpcode := 36, saveOpcode := 37 } ]
   | .Demo_Sink => []
   | .Demo_Dispatcher => []
   | .Demo_Clock => []
@@ -294,12 +298,22 @@ def Instance.all : List Instance :=
   .dispatcher,
   .clock ]
 
+/-- The instance's name in the shells: the FPP base name, or the qualified name flattened when two
+instances of the topology share a base name. -/
 def Instance.name : Instance → String
   | .worker => "worker"
   | .sink => "sink"
   | .«end» => "end"
   | .dispatcher => "dispatcher"
   | .clock => "clock"
+
+/-- The instance's qualified FPP name. -/
+def Instance.qualifiedName : Instance → String
+  | .worker => "Demo.worker"
+  | .sink => "Demo.sink"
+  | .«end» => "Demo.end"
+  | .dispatcher => "Demo.dispatcher"
+  | .clock => "Demo.clock"
 
 def Instance.component : Instance → Component
   | .worker => .Demo_Worker

@@ -13,7 +13,7 @@ basicOptions()
 fileOut()
 {
   $fpp_to_sysml -i $imports -o fileOut.out.txt basic.fpp 2>&1 | remove_version | remove_path_prefix > fileOut.err.txt
-  remove_version < fileOut.out.txt > fileOut.tmp.txt && mv fileOut.tmp.txt fileOut.out.txt
+  remove_version < fileOut.out.txt | remove_path_prefix > fileOut.tmp.txt && mv fileOut.tmp.txt fileOut.out.txt
   cat fileOut.err.txt >> fileOut.out.txt
   compare fileOut
 }

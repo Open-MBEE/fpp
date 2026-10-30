@@ -71,7 +71,7 @@ object SysmlShellWriter {
   }
 
   def portKind(k: PortKind): String = k match {
-    case PortKind.AsyncInput(q) => s"async input, queue full: ${queueFullName(q)}"
+    case PortKind.AsyncInput(p, q) => s"async input, ${p.map(n => s"priority $n, ").getOrElse("")}queue full: ${queueFullName(q)}"
     case PortKind.SyncInput => "sync input"
     case PortKind.GuardedInput => "guarded input"
     case PortKind.Output => "output"
@@ -111,27 +111,34 @@ object SysmlShellWriter {
   /** A SysML string literal. */
   def quoted(t: String): String = "\"" + t.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
 
-  def throttleNote(o: Option[BigInt]): String = o.map(n => s", throttle $n").getOrElse("")
-
   def defaultNote(o: Option[String]): String = o.map(d => s"  // default $d").getOrElse("")
 
+  /** `string[40]` is `Contract::SizedString` with its size: two contracts whose string limits differ must differ. */
+  def contractAttr(name: String, ty: String): String =
+    if ty.startsWith("string[") then
+      s"attribute ${ident(name)} : Contract::SizedString { attribute :>> size = ${ty.stripPrefix("string[").stripSuffix("]")}; }"
+    else s"attribute ${ident(name)} : ${typeRef(ty)};"
+
   def attrLines(params: List[Param]): List[String] =
-    params.map(p => s"            attribute ${ident(p.name)} : ${typeRef(p.ty)};${if p.ref then "  // ref" else ""}")
+    params.map(p => s"            ${contractAttr(p.name, p.ty)}${if p.ref then "  // ref" else ""}")
+
+  def throttleAttr(o: Option[BigInt]): List[String] = o.toList.map(n => s"            attribute :>> throttle = $n;")
 
   /** A component's external contract as items of the part def: one per command, event, telemetry channel
    *  and parameter, each specializing the `Contract` definitions with its id (relative to the base id). */
   def contractLines(c: ComponentDef): List[String] = {
     val cmds = c.commands.flatMap(k =>
-      List(s"        item cmd_${ident(k.name)} : Contract::Command {  // ${commandKind(k.kind)}",
+      List(s"        item ${ident(s"cmd_${k.name}")} : Contract::Command {  // ${commandKind(k.kind)}",
            s"            attribute :>> opcode = ${k.opcode};") ++ attrLines(k.params) ++ List("        }"))
     val evrs = c.events.flatMap(e =>
-      List(s"        item evr_${ident(e.name)} : Contract::Event {  // ${e.severity}${throttleNote(e.throttle)}",
+      List(s"        item ${ident(s"evr_${e.name}")} : Contract::Event {",
            s"            attribute :>> id = ${e.id};",
-           s"            attribute :>> format = ${quoted(e.format)};") ++ attrLines(e.params) ++ List("        }"))
+           s"            attribute :>> severity = ${quoted(e.severity)};",
+           s"            attribute :>> format = ${quoted(e.format)};") ++ throttleAttr(e.throttle) ++ attrLines(e.params) ++ List("        }"))
     val tlms = c.telemetry.map(t =>
-      s"        item tlm_${ident(t.name)} : Contract::Channel { attribute :>> id = ${t.id}; attribute value : ${typeRef(t.ty)}; }  // ${t.update}")
+      s"        item ${ident(s"tlm_${t.name}")} : Contract::Channel { attribute :>> id = ${t.id}; attribute :>> update = ${quoted(t.update)}; ${contractAttr("value", t.ty)} }")
     val prms = c.parameters.map(p =>
-      s"        item prm_${ident(p.name)} : Contract::Parameter { attribute :>> id = ${p.id}; attribute :>> setOpcode = ${p.setOpcode}; attribute :>> saveOpcode = ${p.saveOpcode}; attribute value : ${typeRef(p.ty)}; }${defaultNote(p.default)}")
+      s"        item ${ident(s"prm_${p.name}")} : Contract::Parameter { attribute :>> id = ${p.id}; attribute :>> setOpcode = ${p.setOpcode}; attribute :>> saveOpcode = ${p.saveOpcode}; ${contractAttr("value", p.ty)} }${defaultNote(p.default)}")
     cmds ++ evrs ++ tlms ++ prms
   }
 
@@ -168,7 +175,7 @@ object SysmlShellWriter {
     val opaques = named.map(t => s"        attribute def ${ident(t)};  // FPP type $t, opaque here")
     val insts = m.instances.map { i =>
       val c = m.component(i.component).map(c => ctor(c.qname)).getOrElse("?")
-      s"        part ${ident(i.name)} : $c;  // base id ${i.baseId}" + i.queueSize.map(q => s", queue size $q").getOrElse("")
+      s"        part ${ident(i.name)} : $c;  // ${i.qname.mkString(".")}, base id ${i.baseId}" + i.queueSize.map(q => s", queue size $q").getOrElse("")
     }
     val topology = m.topology.mkString(".")
     for {
@@ -192,9 +199,10 @@ ${opaques.mkString("\n")}
     }
 
     package Contract {  // what the dictionary publishes about a component; ids are relative to the instance's base id
+        attribute def SizedString :> String { attribute size : Natural; }  // FPP `string[size]`
         item def Command { attribute opcode : Natural; }
-        item def Event { attribute id : Natural; attribute format : String; }
-        item def Channel { attribute id : Natural; }
+        item def Event { attribute id : Natural; attribute severity : String; attribute format : String; attribute throttle : Natural[0..1]; }
+        item def Channel { attribute id : Natural; attribute update : String; }
         item def Parameter { attribute id : Natural; attribute setOpcode : Natural; attribute saveOpcode : Natural; }
     }
 

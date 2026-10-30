@@ -24,9 +24,10 @@ package FppGen {
     }
 
     package Contract {  // what the dictionary publishes about a component; ids are relative to the instance's base id
+        attribute def SizedString :> String { attribute size : Natural; }  // FPP `string[size]`
         item def Command { attribute opcode : Natural; }
-        item def Event { attribute id : Natural; attribute format : String; }
-        item def Channel { attribute id : Natural; }
+        item def Event { attribute id : Natural; attribute severity : String; attribute format : String; attribute throttle : Natural[0..1]; }
+        item def Channel { attribute id : Natural; attribute update : String; }
         item def Parameter { attribute id : Natural; attribute setOpcode : Natural; attribute saveOpcode : Natural; }
     }
 
@@ -95,8 +96,8 @@ package FppGen {
         port cmdIn : Fw_Cmd;  // command recv port, async input, queue full: assert
         port cmdRegOut : ~Fw_CmdReg;  // command reg port, output
         port cmdResponseOut : ~Fw_CmdResponse;  // command resp port, output
-        port dataIn_0 : Demo_Data;  // async input, queue full: drop
-        port dataIn_1 : Demo_Data;  // async input, queue full: drop
+        port dataIn_0 : Demo_Data;  // async input, priority 3, queue full: drop
+        port dataIn_1 : Demo_Data;  // async input, priority 3, queue full: drop
         port dataOut_0 : ~Demo_Data;  // output
         port dataOut_1 : ~Demo_Data;  // output
         port eventOut : ~Fw_Log;  // event port, output
@@ -111,7 +112,7 @@ package FppGen {
         item cmd_START : Contract::Command {  // async, queue full drop
             attribute :>> opcode = 16;
             attribute count : Integer;
-            attribute name : String;
+            attribute name : Contract::SizedString { attribute :>> size = 8; }
         }
         item cmd_STOP : Contract::Command {  // sync
             attribute :>> opcode = 17;
@@ -119,6 +120,9 @@ package FppGen {
         item cmd_RESET : Contract::Command {  // guarded
             attribute :>> opcode = 18;
             attribute hard : Boolean;
+        }
+        item cmd_end : Contract::Command {  // sync
+            attribute :>> opcode = 19;
         }
         item cmd_RATE_PRM_SET : Contract::Command {  // param set
             attribute :>> opcode = 32;
@@ -132,19 +136,29 @@ package FppGen {
         item cmd_ENABLED_PRM_SAVE : Contract::Command {  // param save
             attribute :>> opcode = 35;
         }
-        item evr_Started : Contract::Event {  // activity high
+        item cmd_BURST_PRM_SET : Contract::Command {  // param set
+            attribute :>> opcode = 36;
+        }
+        item cmd_BURST_PRM_SAVE : Contract::Command {  // param save
+            attribute :>> opcode = 37;
+        }
+        item evr_Started : Contract::Event {
             attribute :>> id = 1;
+            attribute :>> severity = "activity high";
             attribute :>> format = "started {} times";
             attribute count : Integer;
         }
-        item evr_Overrun : Contract::Event {  // warning low, throttle 5
+        item evr_Overrun : Contract::Event {
             attribute :>> id = 2;
+            attribute :>> severity = "warning low";
             attribute :>> format = "overrun";
+            attribute :>> throttle = 5;
         }
-        item tlm_Count : Contract::Channel { attribute :>> id = 1; attribute value : Integer; }  // on change
-        item tlm_Last : Contract::Channel { attribute :>> id = 2; attribute value : Types::Sample; }  // always
+        item tlm_Count : Contract::Channel { attribute :>> id = 1; attribute :>> update = "on change"; attribute value : Integer; }
+        item tlm_Last : Contract::Channel { attribute :>> id = 2; attribute :>> update = "always"; attribute value : Types::Sample; }
         item prm_Rate : Contract::Parameter { attribute :>> id = 1; attribute :>> setOpcode = 32; attribute :>> saveOpcode = 33; attribute value : Real; }  // default 1.5
         item prm_Enabled : Contract::Parameter { attribute :>> id = 2; attribute :>> setOpcode = 34; attribute :>> saveOpcode = 35; attribute value : Boolean; }  // default true
+        item prm_Burst : Contract::Parameter { attribute :>> id = 3; attribute :>> setOpcode = 36; attribute :>> saveOpcode = 37; attribute value : Integer; }  // default 4
     }
 
     part def Demo_Sink {  // passive component Demo.Sink
@@ -169,11 +183,11 @@ package FppGen {
     }
 
     part def Demo_Basic {
-        part worker : Demo_Worker;  // base id 256, queue size 10
-        part sink : Demo_Sink;  // base id 512
-        part 'end' : Demo_Sink;  // base id 768
-        part dispatcher : Demo_Dispatcher;  // base id 1024
-        part clock : Demo_Clock;  // base id 1280
+        part worker : Demo_Worker;  // Demo.worker, base id 256, queue size 10
+        part sink : Demo_Sink;  // Demo.sink, base id 512
+        part 'end' : Demo_Sink;  // Demo.end, base id 768
+        part dispatcher : Demo_Dispatcher;  // Demo.dispatcher, base id 1024
+        part clock : Demo_Clock;  // Demo.clock, base id 1280
 
         connect dispatcher.compCmdSend_0 to worker.cmdIn;  // Command
         connect worker.cmdRegOut to dispatcher.compCmdReg_0;  // CommandRegistration

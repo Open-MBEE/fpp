@@ -6,7 +6,7 @@ fpp_to_sysml=$COMPILER_ROOT/bin/fpp-to-sysml
 
 remove_version()
 {
-  sed -e 's/(fpp [^)]*)/(fpp [version])/' -e 's/^def fppVersion := .*/def fppVersion := "[version]"/'
+  sed -e 's/(fpp [^)]*)/(fpp [version])/' -e 's/^def fppVersion : String := .*/def fppVersion : String := "[version]"/'
 }
 
 update()
