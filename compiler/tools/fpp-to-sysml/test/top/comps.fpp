@@ -2,6 +2,8 @@ module Demo {
 
   constant BURST = 4
 
+  enum Mode { Idle, Ready }
+
   struct Sample { value: U32, ok: bool }
   array Readings = [3] F32
 
@@ -43,6 +45,8 @@ module Demo {
     param Enabled: bool default true id 2
     @ A default that is a constant: the shells carry its value
     param Burst: U32 default BURST id 3
+    @ An enum default: the shells carry the enum's qualified name and the member
+    param Gear: Mode default Mode.Ready id 4
   }
 
   passive component Sink {

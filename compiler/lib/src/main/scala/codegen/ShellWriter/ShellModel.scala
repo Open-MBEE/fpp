@@ -60,20 +60,20 @@ object ShellModel {
     if a.src == b.src then endpointLe(a.dst, b.dst) else endpointLe(a.src, b.src)
 
   /** The text of a value the analysis evaluated: what the dictionary publishes (a constant's name is
-   *  resolved, an enum constant is its name), strings unquoted. */
-  def valueText(v: Value): String = v match {
+   *  resolved, an enum constant is `Enum.Member` by the enum's qualified name), strings unquoted. */
+  def valueText(a: Analysis, v: Value): String = v match {
     case Value.PrimitiveInt(n, _) => n.toString
     case Value.Integer(n) => n.toString
     case Value.Float(f, _) => f.toString
     case Value.Boolean(b) => b.toString
     case Value.String(s) => s
-    case Value.EnumConstant((name, _), _) => name
+    case Value.EnumConstant((name, _), t) => s"${a.getQualifiedName(Symbol.Enum(t.node))}.$name"
     case other => other.toString
   }
 
   /** The text of a default expression: its evaluated value, or the literal when the analysis holds none. */
   def defaultText(a: Analysis, node: AstNode[Ast.Expr]): Result.Result[String] =
-    a.valueMap.get(node.id).map(valueText) match {
+    a.valueMap.get(node.id).map(valueText(a, _)) match {
       case Some(t) => Right(t)
       case None => node.data match {
         case Ast.ExprLiteralInt(v) => Right(v)

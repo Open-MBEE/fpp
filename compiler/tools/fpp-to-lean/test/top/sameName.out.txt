@@ -239,7 +239,9 @@ def Component.commands : Component → List Command
     { name := "ENABLED_PRM_SET", opcode := 34, kind := .paramSet, params := [] },
     { name := "ENABLED_PRM_SAVE", opcode := 35, kind := .paramSave, params := [] },
     { name := "BURST_PRM_SET", opcode := 36, kind := .paramSet, params := [] },
-    { name := "BURST_PRM_SAVE", opcode := 37, kind := .paramSave, params := [] } ]
+    { name := "BURST_PRM_SAVE", opcode := 37, kind := .paramSave, params := [] },
+    { name := "GEAR_PRM_SET", opcode := 38, kind := .paramSet, params := [] },
+    { name := "GEAR_PRM_SAVE", opcode := 39, kind := .paramSave, params := [] } ]
   | .Demo_Clock => []
   | .Demo_Dispatcher => []
 
@@ -262,7 +264,8 @@ def Component.parameters : Component → List Parameter
   | .Demo_Worker => [
     { name := "Rate", id := 1, ty := "F64", default := some "1.5", setOpcode := 32, saveOpcode := 33 },
     { name := "Enabled", id := 2, ty := "bool", default := some "true", setOpcode := 34, saveOpcode := 35 },
-    { name := "Burst", id := 3, ty := "U32", default := some "4", setOpcode := 36, saveOpcode := 37 } ]
+    { name := "Burst", id := 3, ty := "U32", default := some "4", setOpcode := 36, saveOpcode := 37 },
+    { name := "Gear", id := 4, ty := "Mode", default := some "Demo.Mode.Ready", setOpcode := 38, saveOpcode := 39 } ]
   | .Demo_Clock => []
   | .Demo_Dispatcher => []
 
